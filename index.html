@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>HawkerWhere</title>
+  <meta name="description" content="Pick a dish, find the best hawker stalls in Singapore.">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="apple-touch-icon" href="./favicon.svg">
+  <link rel="stylesheet" href="./vendor/maplibre/maplibre-gl.css">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="appbar">
+    <a class="brand" href="./index.html">HawkerWhere</a>
+    <p class="tagline">One dish, every stall, rated.</p>
+  </header>
+
+  <!-- Screen 1: dish picker -->
+  <section id="picker-screen" class="screen screen-active" aria-label="Pick a dish">
+    <h1>What are you craving?</h1>
+    <div class="search-wrap">
+      <input id="dish-search" type="search" placeholder="Search dishes, e.g. laksa" autocomplete="off" aria-label="Search dishes">
+    </div>
+    <div id="dish-chips" class="chip-grid" role="listbox" aria-label="Dish list"></div>
+    <p id="picker-meta" class="meta"></p>
+  </section>
+
+  <!-- Screen 2: map -->
+  <section id="map-screen" class="screen" aria-label="Stall map">
+    <div class="map-toolbar">
+      <button id="back-btn" class="btn ghost" type="button" aria-label="Back to dishes">‹ Dishes</button>
+      <h2 id="map-title">All stalls</h2>
+      <button id="near-btn" class="btn" type="button">Near me</button>
+    </div>
+    <div class="map-controls">
+      <div class="segment" role="group" aria-label="Pin mode">
+        <button id="mode-stalls" class="seg active" type="button" aria-pressed="true">Stalls</button>
+        <button id="mode-venues" class="seg" type="button" aria-pressed="false">Venues</button>
+      </div>
+      <p id="result-count" class="meta"></p>
+    </div>
+    <div id="map" aria-label="Singapore map with stall pins"></div>
+    <div id="empty-state" class="empty-state hidden">
+      <p class="empty-title">No stalls yet for this dish</p>
+      <p class="empty-body">Our list is still growing. Try another dish, or check back soon.</p>
+    </div>
+    <ul id="result-list" class="result-list" aria-label="Stalls sorted by distance or rating"></ul>
+  </section>
+
+  <!-- Stall card bottom sheet -->
+  <div id="sheet-scrim" class="scrim hidden"></div>
+  <div id="stall-sheet" class="sheet hidden" role="dialog" aria-modal="true" aria-labelledby="sheet-name">
+    <div class="sheet-grabber"></div>
+    <button id="sheet-close" class="sheet-close" type="button" aria-label="Close stall card">✕</button>
+    <h3 id="sheet-name"></h3>
+    <p id="sheet-dish" class="sheet-dish"></p>
+    <p id="sheet-rating" class="sheet-rating"></p>
+    <p id="sheet-venue" class="sheet-venue"></p>
+    <p id="sheet-safe" class="sheet-safe"></p>
+    <p id="sheet-status" class="sheet-status"></p>
+    <a id="sheet-directions" class="btn primary sheet-directions" href="#" target="_blank" rel="noopener">Get directions</a>
+    <div class="tag-box">
+      <p class="tag-prompt">Know this stall's specialty? Tell us.</p>
+      <button id="tag-open" class="btn ghost" type="button">Tag this stall</button>
+      <div id="tag-form" class="hidden">
+        <div id="tag-chips" class="chip-grid small" role="listbox" aria-label="Dish tags"></div>
+        <p id="tag-thanks" class="tag-thanks hidden">Thanks. Your tag is saved and will be reviewed.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tag queue uses localStorage only. No backend in v1. -->
+  <script src="./vendor/maplibre/maplibre-gl.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
