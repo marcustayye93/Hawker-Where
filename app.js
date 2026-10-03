@@ -24,6 +24,7 @@
   var currentDish = null;
   var pinMode = "stalls";   // "stalls" | "venues"
   var userLoc = null;       // [lat, lng]
+  var userMarker = null;    // MapLibre marker for the user's dot
   var sheetStall = null;
 
   /* ---------- helpers ---------- */
@@ -122,32 +123,56 @@
   /* ---------- screen 1: dish picker ---------- */
 
   function renderPicker(source) {
-    var grid = $("dish-chips");
-    grid.innerHTML = "";
+    var meta = $("picker-meta");
+    meta.textContent = data.taxonomy.length + " dishes, " +
+      fmtCount(data.stalls.length) + " stalls across Singapore." +
+      (source === "sample" ? " Sample preview data." : "");
+    var input = $("dish-search");
+    input.placeholder = "Search " + data.taxonomy.length + " dishes, e.g. laksa";
+    input.addEventListener("input", function () { renderSuggestions(input.value); });
+    input.addEventListener("focus", function () { renderSuggestions(input.value); });
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        var first = $("dish-suggestions").querySelector(".suggest-item");
+        if (first) first.click();
+      }
+    });
+  }
+
+  // Live suggestions under the one search bar: as the user types,
+  // matching dishes appear; tapping one goes straight to the map.
+  function dishMatches(q) {
+    q = q.trim().toLowerCase();
+    if (!q) return [];
+    var starts = [], contains = [];
     data.taxonomy.forEach(function (dish) {
+      var d = dish.toLowerCase();
+      if (d.indexOf(q) === 0) starts.push(dish);
+      else if (d.indexOf(q) !== -1) contains.push(dish);
+    });
+    return starts.concat(contains).slice(0, 8);
+  }
+
+  function renderSuggestions(q) {
+    var box = $("dish-suggestions");
+    var matches = dishMatches(q || "");
+    if (!matches.length) {
+      box.innerHTML = q && q.trim()
+        ? "<p class='suggest-empty'>No dish matches that yet.</p>" : "";
+      box.classList.toggle("hidden", !q || !q.trim());
+      return;
+    }
+    box.innerHTML = "";
+    matches.forEach(function (dish) {
       var b = document.createElement("button");
       b.type = "button";
-      b.className = "chip";
-      b.textContent = dish;
+      b.className = "suggest-item";
       b.setAttribute("role", "option");
+      b.innerHTML = "<span class='suggest-name'>" + esc(dish) + "</span>";
       b.addEventListener("click", function () { pickDish(dish); });
-      grid.appendChild(b);
+      box.appendChild(b);
     });
-    var meta = $("picker-meta");
-    meta.textContent = data.taxonomy.length + " dishes. Data: " +
-      (source === "sample" ? "sample preview" : "live list") +
-      " of " + data.stalls.length + " stalls.";
-    $("dish-search").placeholder = "Search " + data.taxonomy.length + " dishes, e.g. laksa";
-    $("dish-search").addEventListener("input", function (e) {
-      var q = e.target.value.trim().toLowerCase();
-      var shown = 0;
-      grid.querySelectorAll(".chip").forEach(function (chip) {
-        var hit = chip.textContent.toLowerCase().indexOf(q) !== -1;
-        chip.style.display = hit ? "" : "none";
-        if (hit) shown++;
-      });
-      meta.textContent = shown + " of " + data.taxonomy.length + " dishes.";
-    });
+    box.classList.remove("hidden");
   }
 
   /* ---------- screen 2: map ---------- */
@@ -229,8 +254,10 @@
   function pickDish(dish) {
     currentDish = dish;
     $("map-title").textContent = dish;
+    $("dish-suggestions").classList.add("hidden");
     showScreen("map-screen");
     renderPins();
+    // Location is only requested when the user taps Near me.
   }
 
   function filteredStalls() {
@@ -389,14 +416,9 @@
   function stallVenue(s) { return venueById[s.venue_id]; }
 
   function sortKey(s) {
-    if (userLoc) {
-      var v = stallVenue(s);
-      if (!v) return [1, 0];
-      return [0, haversineKm(userLoc[0], userLoc[1], v.lat, v.lng)];
-    }
     // Weighted rating: a 5.0 from 3 reviews must not outrank a 4.7
     // backed by hundreds. Bayesian average against the dataset mean.
-    // Unrated stalls last.
+    // Unrated stalls last. Location never reorders this list.
     if (s.rating == null) return [0, Infinity];
     var c = s.rating_count || 0;
     var w = (s.rating * c + 3.9 * 25) / (c + 25);
@@ -429,24 +451,57 @@
     });
   }
 
-  function nearMe() {
+  // User location: a blue dot on the map, so each user can see where
+  // they are relative to the stalls. The result list keeps its
+  // rating order; the dot is for orientation only.
+  function drawUserDot() {
+    if (!map || !userLoc) return;
+    if (userMarker) userMarker.remove();
+    var el = document.createElement("div");
+    el.className = "user-dot";
+    el.innerHTML = "<span class='user-dot-pulse'></span><span class='user-dot-core'></span>";
+    el.title = "You are here";
+    userMarker = new maplibregl.Marker({ element: el, anchor: "center" })
+      .setLngLat([userLoc[1], userLoc[0]]).addTo(map);
+  }
+
+  function locateUser(center) {
     if (!navigator.geolocation) {
-      $("result-count").textContent = "Geolocation is not supported on this device.";
+      if (center) $("result-count").textContent = "Location is not supported on this device.";
       return;
     }
-    $("near-btn").disabled = true;
-    $("near-btn").textContent = "Locating...";
+    var btn = $("near-btn");
+    btn.disabled = true;
+    btn.textContent = "Locating...";
     navigator.geolocation.getCurrentPosition(function (pos) {
       userLoc = [pos.coords.latitude, pos.coords.longitude];
-      $("near-btn").disabled = false;
-      $("near-btn").textContent = "Near me";
-      $("result-count").textContent = "Sorted by distance from you";
-      renderResultList(filteredStalls());
+      btn.disabled = false;
+      btn.textContent = "Near me";
+      drawUserDot();
+      if (center && map) {
+        map.jumpTo({ center: [userLoc[1], userLoc[0]],
+                     zoom: Math.max(map.getZoom(), 14.5) });
+      }
+      var stalls = filteredStalls();
+      $("result-count").textContent = stalls.length +
+        " stall" + (stalls.length === 1 ? "" : "s");
+      renderResultList(stalls);
     }, function () {
-      $("near-btn").disabled = false;
-      $("near-btn").textContent = "Near me";
-      $("result-count").textContent = "Could not get your location. Showing top rated.";
-    }, { timeout: 10000 });
+      btn.disabled = false;
+      btn.textContent = "Near me";
+      if (center) $("result-count").textContent = "Could not get your location. Showing top rated.";
+    }, { timeout: 10000, maximumAge: 60000 });
+  }
+
+  function nearMe() {
+    if (userLoc) {
+      drawUserDot();
+      if (map) map.jumpTo({ center: [userLoc[1], userLoc[0]],
+                            zoom: Math.max(map.getZoom(), 14.5) });
+      renderResultList(filteredStalls());
+      return;
+    }
+    locateUser(true);
   }
 
   /* ---------- stall card (bottom sheet) ---------- */

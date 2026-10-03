@@ -18,13 +18,13 @@
     <p class="tagline">One dish, every stall, rated.</p>
   </header>
 
-  <!-- Screen 1: dish picker -->
+  <!-- Screen 1: dish search -->
   <section id="picker-screen" class="screen screen-active" aria-label="Pick a dish">
-    <h1>What are you craving?</h1>
+    <h1>What food are you looking to eat?</h1>
     <div class="search-wrap">
       <input id="dish-search" type="search" placeholder="Search dishes, e.g. laksa" autocomplete="off" aria-label="Search dishes">
+      <div id="dish-suggestions" class="suggest hidden" role="listbox" aria-label="Matching dishes"></div>
     </div>
-    <div id="dish-chips" class="chip-grid" role="listbox" aria-label="Dish list"></div>
     <p id="picker-meta" class="meta"></p>
   </section>
 

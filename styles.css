@@ -61,7 +61,7 @@ h1 {
 h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
 
 /* Search: one floating pill, Airbnb style */
-.search-wrap { margin-bottom: 20px; }
+.search-wrap { margin-bottom: 20px; position: relative; }
 #dish-search {
   width: 100%;
   padding: 15px 20px;
@@ -75,6 +75,38 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
 }
 #dish-search::placeholder { color: var(--muted); }
 #dish-search:focus { border-color: var(--ink); box-shadow: var(--shadow); }
+
+/* Live dish suggestions under the search bar */
+.suggest {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 8px);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  z-index: 600;
+}
+.suggest-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 20px;
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
+  background: var(--paper);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.suggest-item:last-child { border-bottom: none; }
+.suggest-item:hover, .suggest-item:active { background: var(--wash); }
+.suggest-name { font-size: 16px; font-weight: 600; text-transform: capitalize; }
+.suggest-empty { margin: 0; padding: 14px 20px; font-size: 14.5px; color: var(--muted); }
 
 /* Dish chips: quiet pills, black when picked */
 .chip-grid {
@@ -207,6 +239,37 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
 }
 .pin.cluster.c-md { width: 46px; height: 46px; font-size: 15px; }
 .pin.cluster.c-lg { width: 54px; height: 54px; font-size: 16px; background: var(--red); }
+
+/* User location dot: blue, pulsing ring, sits above the pins. */
+.user-dot { position: relative; width: 22px; height: 22px; pointer-events: none; }
+.user-dot-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: #1a73e8;
+  border: 2.5px solid #fff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+.user-dot-pulse {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 38px;
+  height: 38px;
+  margin: -19px 0 0 -19px;
+  border-radius: 50%;
+  background: rgba(26, 115, 232, 0.25);
+  animation: user-pulse 2.4s ease-out infinite;
+}
+@keyframes user-pulse {
+  0% { transform: scale(0.45); opacity: 0.9; }
+  70% { transform: scale(1); opacity: 0; }
+  100% { transform: scale(1); opacity: 0; }
+}
 
 /* MapLibre chrome, softened */
 .maplibregl-ctrl-group { border-radius: 999px; overflow: hidden; box-shadow: var(--shadow); }
