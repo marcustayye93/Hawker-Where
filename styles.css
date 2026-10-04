@@ -1,6 +1,8 @@
-/* HawkerWhere v1 styles. Mobile first.
-   Direction: Airbnb-clean. White surfaces, near-black text, one red
-   accent, big pill shapes, soft shadows. No gradients, no clutter. */
+/* HawkerWhere styles. Mobile first.
+   Direction (5 Oct, per Marcus): editorial pairing from his Stock
+   Research Tool reference. Serif display for headlines, clean sans
+   for UI. Red and white. Fewer pill buttons: angular radii, and
+   choices shown as borderless tabs with a red underline. */
 
 :root {
   --red: #ff385c;
@@ -11,6 +13,7 @@
   --muted: #717171;
   --line: #dddddd;
   --shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  --font-display: "Iowan Old Style", Georgia, "Times New Roman", serif;
 }
 
 * { box-sizing: border-box; }
@@ -52,24 +55,25 @@ html, body {
 .screen-active { display: block; }
 
 h1 {
-  font-size: clamp(28px, 7.5vw, 40px);
+  font-family: var(--font-display);
+  font-size: clamp(30px, 8vw, 44px);
   font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
   margin: 4px 0 18px;
   text-align: center;
 }
 #picker-meta { text-align: center; }
 h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
 
-/* Search: one floating pill, Airbnb style */
+/* Search: one floating bar, angular corners */
 .search-wrap { margin-bottom: 20px; position: relative; }
 #dish-search {
   width: 100%;
   padding: 15px 20px;
   font-size: 16px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 14px;
   background: var(--paper);
   color: var(--ink);
   outline: none;
@@ -86,7 +90,7 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
   top: calc(100% + 8px);
   background: var(--paper);
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: 16px;
   box-shadow: var(--shadow);
   overflow: hidden;
   z-index: 600;
@@ -121,7 +125,7 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
   border: 1px solid var(--line);
   background: var(--paper);
   color: var(--ink);
-  border-radius: 999px;
+  border-radius: 10px;
   padding: 11px 18px;
   font-size: 15px;
   cursor: pointer;
@@ -138,12 +142,12 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
 }
 .meta { color: var(--muted); font-size: 13.5px; margin-top: 18px; }
 
-/* Buttons: red pill, white pill, quiet pill */
+/* Buttons: angular red, angular white. Choices are tabs, not pills. */
 .btn {
   background: var(--red);
   color: #fff;
   border: none;
-  border-radius: 999px;
+  border-radius: 12px;
   padding: 11px 20px;
   font-size: 15px;
   font-weight: 600;
@@ -179,24 +183,28 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
   gap: 10px;
   background: var(--paper);
 }
+/* Choices: borderless tabs, selected one carries a red underline. */
 .segment {
   display: inline-flex;
-  background: var(--wash);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 3px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  padding: 0;
 }
 .seg {
   border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
   background: transparent;
-  border-radius: 999px;
-  padding: 8px 18px;
+  border-radius: 0;
+  padding: 8px 14px;
   font-size: 14px;
   font-weight: 600;
   color: var(--muted);
   cursor: pointer;
 }
-.seg.active { background: var(--paper); color: var(--ink); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12); }
+.seg.active { background: none; color: var(--ink); border-bottom-color: var(--red); box-shadow: none; }
 #map { height: 52vh; min-height: 320px; z-index: 1; background: #f2f2f0; }
 /* Basemap rendered grayscale so no tile colour shows through.
    Markers are separate DOM elements, so pins keep their colour. */
@@ -274,9 +282,9 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
 }
 
 /* MapLibre chrome, softened */
-.maplibregl-ctrl-group { border-radius: 999px; overflow: hidden; box-shadow: var(--shadow); }
+.maplibregl-ctrl-group { border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); }
 .maplibregl-ctrl-group button { width: 34px; height: 34px; }
-.maplibregl-popup-content { border-radius: 16px; box-shadow: var(--shadow); font-family: inherit; font-size: 14px; padding: 12px 16px; }
+.maplibregl-popup-content { border-radius: 12px; box-shadow: var(--shadow); font-family: inherit; font-size: 14px; padding: 12px 16px; }
 .maplibregl-ctrl-attrib { font-size: 10px; }
 
 /* Empty state */
@@ -284,35 +292,39 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
   margin: 16px 20px;
   background: var(--paper);
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: 14px;
   padding: 28px 20px;
   text-align: center;
 }
-.empty-title { font-weight: 600; font-size: 17px; margin: 0 0 8px; }
+.empty-title { font-family: var(--font-display); font-weight: 700; font-size: 19px; margin: 0 0 8px; }
 .empty-body { color: var(--muted); font-size: 14px; margin: 0; }
 .hidden { display: none !important; }
 
 /* Can't decide: curated tabs on the landing page */
 .inspire { margin-top: 42px; }
 .inspire h2 {
-  font-size: clamp(22px, 6vw, 30px);
-  font-weight: 800;
-  letter-spacing: -0.5px;
+  font-family: var(--font-display);
+  font-size: clamp(24px, 6.5vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
   margin: 0 0 14px;
 }
 .inspire-tabs {
   display: inline-flex;
   gap: 4px;
-  background: var(--wash);
-  border-radius: 999px;
-  padding: 4px;
+  background: none;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  padding: 0;
   margin-bottom: 10px;
 }
 .inspire-tab {
-  border: 1px solid transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
   background: none;
-  padding: 8px 18px;
-  border-radius: 999px;
+  padding: 8px 14px;
+  border-radius: 0;
   font: inherit;
   font-size: 14.5px;
   font-weight: 600;
@@ -320,10 +332,10 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
   cursor: pointer;
 }
 .inspire-tab.tab-on {
-  background: var(--paper);
+  background: none;
   color: var(--ink);
-  border-color: var(--line);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-bottom-color: var(--red);
+  box-shadow: none;
 }
 .inspire-list { padding: 6px 0 24px; }
 .inspire-empty {
@@ -346,7 +358,7 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
 .result-item {
   background: var(--paper);
   border: 1px solid #ebebeb;
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 15px 18px;
   width: 100%;
   text-align: left;
@@ -375,7 +387,7 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
   bottom: 0;
   z-index: 950;
   background: var(--paper);
-  border-radius: 24px 24px 0 0;
+  border-radius: 18px 18px 0 0;
   padding: 10px 24px calc(24px + env(safe-area-inset-bottom));
   max-width: 720px;
   margin: 0 auto;
@@ -396,13 +408,13 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
   right: 16px;
   background: var(--wash);
   border: none;
-  border-radius: 999px;
+  border-radius: 10px;
   width: 32px;
   height: 32px;
   font-size: 14px;
   cursor: pointer;
 }
-.sheet h3 { margin: 4px 40px 4px 0; font-size: 23px; font-weight: 700; letter-spacing: -0.02em; }
+.sheet h3 { font-family: var(--font-display); margin: 4px 40px 4px 0; font-size: 25px; font-weight: 700; letter-spacing: -0.01em; }
 .sheet-dish { text-transform: capitalize; font-weight: 600; color: var(--red-ink); margin: 0 0 8px; font-size: 14px; }
 .sheet-rating { font-weight: 600; margin: 0 0 10px; }
 .sheet-rating .count { color: var(--muted); font-weight: 400; font-size: 13.5px; }
@@ -413,7 +425,7 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
 .sheet-save { display: block; width: 100%; margin: 8px 0 0; }
 .saved-btn {
   display: block; width: 100%; margin: 14px 0 4px;
-  padding: 14px 20px; border-radius: 999px;
+  padding: 14px 20px; border-radius: 12px;
   background: var(--red); color: #fff; border: 0;
   font: inherit; font-size: 16px; font-weight: 700; cursor: pointer;
 }
