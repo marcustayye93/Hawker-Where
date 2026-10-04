@@ -57,7 +57,9 @@ h1 {
   letter-spacing: -0.03em;
   line-height: 1.1;
   margin: 4px 0 18px;
+  text-align: center;
 }
+#picker-meta { text-align: center; }
 h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
 
 /* Search: one floating pill, Airbnb style */
