@@ -1,0 +1,380 @@
+{
+ "entries": [
+  {
+   "basis": "name",
+   "michelin": "A Noodle Story",
+   "stall_id": "AMO039004"
+  },
+  {
+   "basis": "unit #01-27",
+   "michelin": "Adam Rd Noo Cheng Big Prawn Noodle",
+   "stall_id": "ADF0127003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Alliance Seafood",
+   "stall_id": "NTF0127002"
+  },
+  {
+   "basis": "name (AH 2 Lao Huo Tang), unit #01-141",
+   "michelin": "Ar Er Soup",
+   "stall_id": "BM501141002"
+  },
+  {
+   "basis": "name",
+   "michelin": "Bahrakath Mutton Soup",
+   "stall_id": "ADF0110003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Chai Chuan Tou Yang Rou Tang",
+   "stall_id": "BM30151004"
+  },
+  {
+   "basis": "name",
+   "michelin": "Chey Sua Carrot Cake",
+   "stall_id": "TP10230003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Chuan Kee Boneless Braised Duck",
+   "stall_id": "GM20104002"
+  },
+  {
+   "basis": "name",
+   "michelin": "Delhi Lahori",
+   "stall_id": "BF101266005"
+  },
+  {
+   "basis": "name",
+   "michelin": "Fei Fei Roasted Noodle",
+   "stall_id": "JE20128004"
+  },
+  {
+   "basis": "name",
+   "michelin": "Fu Ming Cooked Food",
+   "stall_id": "RH20149002"
+  },
+  {
+   "basis": "name",
+   "michelin": "Hai Nan Xing Zhou Beef Noodle",
+   "stall_id": "TPA0106003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Han Kee",
+   "stall_id": "AMO129003"
+  },
+  {
+   "basis": "name (Heng Carrot Cake, Newton)",
+   "michelin": "Heng",
+   "stall_id": "NTF0128003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Heng Heng Cooked Food",
+   "stall_id": "JE20112003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Heng Kee",
+   "stall_id": "UC10158003"
+  },
+  {
+   "basis": "name, unit #02-01",
+   "michelin": "Hong Heng Fried Sotong Prawn Mee",
+   "stall_id": "THM0201003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Hong Kong Yummy Soup",
+   "stall_id": "BM20151003"
+  },
+  {
+   "basis": "name (Hoo Kee Rice Dumpling)",
+   "michelin": "Hoo Kee Bak Chang",
+   "stall_id": "AMO018003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Hup Kee Fried Oyster Omelette",
+   "stall_id": "NTF0173003"
+  },
+  {
+   "basis": "name (Famous Crispy Curry Puff, Amoy)",
+   "michelin": "J2 Famous Crispy Curry Puff",
+   "stall_id": "AMO021002"
+  },
+  {
+   "basis": "name",
+   "michelin": "Jason Penang Cuisine",
+   "stall_id": "BM501112003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Ji Ji Noodle House",
+   "stall_id": "UC10248003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Ji Ji Noodle House",
+   "stall_id": "UC10249003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Ji Ji Noodle House",
+   "stall_id": "UC10250004"
+  },
+  {
+   "basis": "name",
+   "michelin": "Joo Siah Bak Koot Teh",
+   "stall_id": "JE101220005"
+  },
+  {
+   "basis": "name",
+   "michelin": "Kelantan Kway Chap Pig Organ Soup",
+   "stall_id": "BSF039003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Koh Brother Pig's Organ Soup",
+   "stall_id": "THM0229003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Kwang Kee Teochew Fish Porridge",
+   "stall_id": "NTF0120003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Kwee Heng",
+   "stall_id": "NTF0113003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Lai Heng Handmade Teochew Kueh",
+   "stall_id": "JE101217005"
+  },
+  {
+   "basis": "name",
+   "michelin": "Lai Heng Handmade Teochew Kueh",
+   "stall_id": "JE101218003"
+  },
+  {
+   "basis": "unit #01-12",
+   "michelin": "Lao Fu Zi Fried Kway Teow",
+   "stall_id": "OA201012001"
+  },
+  {
+   "basis": "name",
+   "michelin": "Lian He Ben Ji Claypot",
+   "stall_id": "SM102198003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Lian He Ben Ji Claypot",
+   "stall_id": "SM102199003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Lixin Teochew Fishball Noodles",
+   "stall_id": "TPA0120003"
+  },
+  {
+   "basis": "unit #01-32",
+   "michelin": "Nam Sing Hokkien Fried Mee",
+   "stall_id": "OA201032001"
+  },
+  {
+   "basis": "name",
+   "michelin": "New Lucky Claypot Rice",
+   "stall_id": "HO20219002"
+  },
+  {
+   "basis": "name, unit #01-17",
+   "michelin": "No.18 Zion Road Fried Kway Teow",
+   "stall_id": "ZRF0117003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Outram Park Fried Kway Teow Mee",
+   "stall_id": "UC10217003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Rajarani Thosai",
+   "stall_id": "TA10133003"
+  },
+  {
+   "basis": "name (Holland Drive branch)",
+   "michelin": "Ru Ji Kitchen",
+   "stall_id": "HO20229004"
+  },
+  {
+   "basis": "name",
+   "michelin": "Selamat Datang Warong Pak Sapari",
+   "stall_id": "ADF0109003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Seng Kee Black Chicken Herbal Soup",
+   "stall_id": "BN20131004"
+  },
+  {
+   "basis": "name",
+   "michelin": "Seng Kee Black Chicken Herbal Soup",
+   "stall_id": "BN20132003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Soh Kee Cooked Food",
+   "stall_id": "JW10144004"
+  },
+  {
+   "basis": "name",
+   "michelin": "Song Fish Soup",
+   "stall_id": "CL30138003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Song Kee Teochew Fish Porridge",
+   "stall_id": "NTF0137003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Tai Seng Fish Soup",
+   "stall_id": "TJF03145003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Tai Wah Pork Noodle",
+   "stall_id": "UC10216004"
+  },
+  {
+   "basis": "name",
+   "michelin": "Tian Nan Xing Minced Pork Noodle",
+   "stall_id": "BN20110003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Tian Tian Hainanese Chicken Rice",
+   "stall_id": "MWF010004"
+  },
+  {
+   "basis": "name",
+   "michelin": "Tian Tian Hainanese Chicken Rice",
+   "stall_id": "MWF011005"
+  },
+  {
+   "basis": "name",
+   "michelin": "Tiong Bahru Hainanese Boneless Chicken Rice",
+   "stall_id": "THM0282003"
+  },
+  {
+   "basis": "unit #01-135",
+   "michelin": "To-Ricos Kway Chap",
+   "stall_id": "OA201135001"
+  },
+  {
+   "basis": "name",
+   "michelin": "Wok Hei Hor Fun",
+   "stall_id": "RH20194002"
+  },
+  {
+   "basis": "name",
+   "michelin": "Xiu Ji Ikan Bilis Yong Tau Fu",
+   "stall_id": "SM102087003"
+  },
+  {
+   "basis": "name",
+   "michelin": "Xiu Ji Ikan Bilis Yong Tau Fu",
+   "stall_id": "SM102088002"
+  },
+  {
+   "basis": "name",
+   "michelin": "Zhi Wei Xian Zion Road Big Prawn Noodle",
+   "stall_id": "ZRF0104003"
+  },
+  {
+   "basis": "name (Redhill)",
+   "michelin": "Jia Xiang",
+   "stall_id": "RH20135003"
+  },
+  {
+   "stall_id": "WD50146001",
+   "match_basis": "unit #01-46 (Michelin + Eatbook)",
+   "dish": "fish soup",
+   "michelin": "Beach Road Fish Head Bee Hoon"
+  },
+  {
+   "stall_id": "WD40132001",
+   "match_basis": "unit #01-32 (multiple guides)",
+   "dish": "hokkien mee",
+   "michelin": "Singapore Fried Hokkien Mee"
+  },
+  {
+   "stall_id": "GB20135001",
+   "match_basis": "unit #01-35 (Eatbook + Kopitiam guide)",
+   "dish": "duck rice",
+   "michelin": "Cheok Kee"
+  },
+  {
+   "stall_id": "GB20158001",
+   "match_basis": "unit #01-58 (two guides)",
+   "dish": "ban mian",
+   "michelin": "Hui Wei Chilli Ban Mian"
+  },
+  {
+   "stall_id": "GB20112002",
+   "match_basis": "unit #01-12 (local guide; register geography cross-checks)",
+   "michelin": "Spinach Soup"
+  },
+  {
+   "stall_id": "JW10119004",
+   "match_basis": "unit #01-19 (Michelin venue listing)",
+   "dish": "kueh",
+   "michelin": "Dudu Cooked Food"
+  },
+  {
+   "stall_id": "JW10127005",
+   "match_basis": "unit #01-27 (multiple guides + HPB list)",
+   "dish": "kueh",
+   "michelin": "Jian Bo Tiong Bahru Shui Kueh"
+  },
+  {
+   "stall_id": "BM30156003",
+   "match_basis": "unit #01-56 (multiple guides)",
+   "dish": "wanton mee",
+   "michelin": "Yong Chun Wan Ton Noodle"
+  }
+ ],
+ "note": "Michelin Guide Singapore 2026 Bib Gourmand (published 28 Jul 2026). Matched by exact/near-exact SFA stall name at Michelin's stated venue, or by Michelin/various guides' unit number where the SFA record has no usable trade name. 61 hawker establishments (68 stall records) matched; 5 listed hawkers could not be matched with confidence; Bib restaurants are not NEA stalls and are excluded.",
+ "source": "Michelin Guide Singapore 2026 Bib Gourmand selection (97 eateries, published 28 Jul 2026, CNA Lifestyle). This file maps the hawker stalls on that list to stall records in data/stalls.json.",
+ "unmatched_on_register": [
+  {
+   "stated_venue": "Chong Pang Market and Food Centre",
+   "why": "no stalls for this centre in the SFA register",
+   "michelin": "Hai Nan Zai"
+  },
+  {
+   "stated_venue": "Chong Pang Market and Food Centre",
+   "why": "no stalls for this centre in the SFA register",
+   "michelin": "Ji De Lai Hainanese Chicken Rice"
+  },
+  {
+   "stated_venue": "115 Bukit Merah View Market & Hawker Centre",
+   "why": "register lists a different named stall (Yi Lu Fa Pig's Organ Soup) at the cited unit #01-47; unit conflict, not flagged",
+   "michelin": "Na Na Curry"
+  },
+  {
+   "stated_venue": "Tampines Round Market & Food Centre",
+   "why": "register lists a different named stall (Armenian Street Fried Kway Teow) at the cited unit #01-40; unit conflict, not flagged",
+   "michelin": "Yi Pin Wei Braised Duck Kway Chap"
+  },
+  {
+   "stated_venue": "Boon Keng",
+   "why": "stall actually operates at Blk 416 Bedok North Ave 2 #01-53 (kopitiam since 2000), outside the NEA register",
+   "michelin": "Boon Keng Road Fish Head Bee Hoon"
+  }
+ ]
+}

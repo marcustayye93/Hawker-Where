@@ -26,6 +26,21 @@
       <div id="dish-suggestions" class="suggest hidden" role="listbox" aria-label="Matching dishes"></div>
     </div>
     <p id="picker-meta" class="meta"></p>
+    <button id="saved-btn" class="btn saved-btn" type="button">My saved stalls <span id="saved-count"></span></button>
+    <div id="saved-wrap" class="saved-wrap hidden">
+      <ul id="saved-list" class="result-list inspire-list"></ul>
+    </div>
+
+    <!-- Screen 1b: can't decide, curated tabs -->
+    <div id="inspire" class="inspire">
+      <h2>Can't decide? Let us choose for you.</h2>
+      <div class="inspire-tabs" role="tablist" aria-label="Curated lists">
+        <button type="button" id="tab-bib" class="inspire-tab tab-on" role="tab">Bib Gourmand</button>
+        <button type="button" id="tab-author" class="inspire-tab" role="tab">Author's Pick</button>
+      </div>
+      <p id="inspire-note" class="meta"></p>
+      <ul id="inspire-list" class="result-list inspire-list"></ul>
+    </div>
   </section>
 
   <!-- Screen 2: map -->
@@ -62,6 +77,7 @@
     <p id="sheet-safe" class="sheet-safe"></p>
     <p id="sheet-status" class="sheet-status"></p>
     <a id="sheet-directions" class="btn primary sheet-directions" href="#" target="_blank" rel="noopener">Get directions</a>
+    <button id="sheet-save" class="btn ghost sheet-save" type="button">Save this stall</button>
     <div class="tag-box">
       <p class="tag-prompt">Know this stall's specialty? Tell us.</p>
       <button id="tag-open" class="btn ghost" type="button">Tag this stall</button>

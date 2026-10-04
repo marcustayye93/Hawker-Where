@@ -1,6 +1,6 @@
 // HawkerWhere service worker: caches the app shell and the stall data
 // for offline use. Cache-first; bump CACHE_NAME on any shell change.
-const CACHE_NAME = "hawkerwhere-v4";
+const CACHE_NAME = "hawkerwhere-v6";
 const SHELL = [
   "./",
   "./index.html",

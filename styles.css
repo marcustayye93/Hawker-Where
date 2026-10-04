@@ -290,6 +290,46 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
 .empty-body { color: var(--muted); font-size: 14px; margin: 0; }
 .hidden { display: none !important; }
 
+/* Can't decide: curated tabs on the landing page */
+.inspire { margin-top: 42px; }
+.inspire h2 {
+  font-size: clamp(22px, 6vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin: 0 0 14px;
+}
+.inspire-tabs {
+  display: inline-flex;
+  gap: 4px;
+  background: var(--wash);
+  border-radius: 999px;
+  padding: 4px;
+  margin-bottom: 10px;
+}
+.inspire-tab {
+  border: 1px solid transparent;
+  background: none;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+.inspire-tab.tab-on {
+  background: var(--paper);
+  color: var(--ink);
+  border-color: var(--line);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.inspire-list { padding: 6px 0 24px; }
+.inspire-empty {
+  padding: 18px 4px;
+  font-size: 15px;
+  color: var(--muted);
+}
+
 /* Result list under the map: quiet cards, red star */
 .result-list {
   list-style: none;
@@ -368,6 +408,15 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
 .sheet-status .closed-note { color: #c13515; font-weight: 600; }
 .sheet-status .open-note { color: #008a05; font-weight: 600; }
 .sheet-directions { margin: 14px 0 4px; }
+.sheet-save { display: block; width: 100%; margin: 8px 0 0; }
+.saved-btn {
+  display: block; width: 100%; margin: 14px 0 4px;
+  padding: 14px 20px; border-radius: 999px;
+  background: var(--red); color: #fff; border: 0;
+  font: inherit; font-size: 16px; font-weight: 700; cursor: pointer;
+}
+.saved-btn:active { background: #d90b3e; }
+.saved-wrap { margin: 8px 0 4px; }
 .tag-box { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 14px; }
 .tag-prompt { font-size: 14px; font-weight: 600; margin: 0 0 8px; }
 .tag-thanks { color: #008a05; font-weight: 600; font-size: 14px; margin: 10px 0 0; }

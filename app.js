@@ -18,11 +18,13 @@
 
   var data = null;          // full payload: { taxonomy, venues, stalls }
   var venueById = {};       // venue_id -> venue
+  var stallById = {};       // stall id -> stall
   var map = null;
   var markers = [];         // live map markers (MapLibre has no layer group)
   var venuePopup = null;    // shared popup for venue-mode pins
   var currentDish = null;
   var pinMode = "stalls";   // "stalls" | "venues"
+  var inspireTab = "bib";   // "bib" | "author"
   var userLoc = null;       // [lat, lng]
   var userMarker = null;    // MapLibre marker for the user's dot
   var sheetStall = null;
@@ -94,9 +96,13 @@
   function boot(json, source) {
     data = json;
     data.venues.forEach(function (v) { venueById[v.id] = v; });
+    data.stalls.forEach(function (s) { stallById[s.id] = s; });
     renderPicker(source);
+    renderInspire();
+    refreshSavedUI();
     initMap();
     showScreen("picker-screen");
+    handleDeepLink();
   }
 
   function showDataError() {
@@ -175,6 +181,147 @@
     box.classList.remove("hidden");
   }
 
+  /* ---------- can't decide: curated tabs ---------- */
+
+  function inspireStalls(tab) {
+    if (tab === "author") {
+      return data.stalls.filter(function (s) { return s.author_pick; });
+    }
+    return data.stalls.filter(function (s) { return s.bib; });
+  }
+
+  function renderInspire() {
+    var list = $("inspire-list");
+    var note = $("inspire-note");
+    $("tab-bib").classList.toggle("tab-on", inspireTab === "bib");
+    $("tab-author").classList.toggle("tab-on", inspireTab === "author");
+    var stalls = inspireStalls(inspireTab);
+    list.innerHTML = "";
+
+    if (inspireTab === "author" && !stalls.length) {
+      note.textContent = "";
+      var li0 = document.createElement("li");
+      li0.className = "inspire-empty";
+      li0.textContent = "The author's picks land here soon.";
+      list.appendChild(li0);
+      return;
+    }
+
+    var names = {};
+    stalls.forEach(function (s) { names[s.bib_name || s.name] = true; });
+    note.textContent = inspireTab === "bib"
+      ? "Michelin Bib Gourmand 2026: " + Object.keys(names).length +
+        " hawker establishments on the map."
+      : Object.keys(names).length + " hand picked stalls.";
+
+    stalls.slice().sort(function (a, b) {
+      return (a.bib_name || a.name).localeCompare(b.bib_name || b.name);
+    }).forEach(function (s) {
+      var v = venueById[s.venue_id];
+      var li = document.createElement("li");
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "result-item";
+      btn.innerHTML =
+        "<p class='r-name'>" + esc(s.bib_name || s.name) + "</p>" +
+        "<p class='r-rating'>" + esc(ratingLine(s).short) + "</p>" +
+        "<p class='r-sub'>" + esc(s.dish || "Dish not tagged yet") + " &middot; " +
+        esc(v ? v.name : "") + (s.unit ? " &middot; " + esc(s.unit) : "") + "</p>";
+      btn.addEventListener("click", function () { openCuratedStall(s); });
+      li.appendChild(btn);
+      list.appendChild(li);
+    });
+  }
+
+  function setInspireTab(tab) {
+    inspireTab = tab;
+    renderInspire();
+  }
+
+  // A curated card goes to the map on the stall's own dish filter,
+  // then opens the stall card.
+  function openCuratedStall(s) {
+    if (s.dish) {
+      pickDish(s.dish);
+    } else {
+      currentDish = null;
+      $("map-title").textContent = s.bib_name || s.name;
+      showScreen("map-screen");
+      renderPins();
+    }
+    openSheet(s);
+  }
+
+  /* ---------- saved stalls (this device only, localStorage) ---------- */
+
+  var SAVED_KEY = "hawkerwhere:saved";
+  var savedOpen = false;
+
+  function savedIds() {
+    try {
+      var raw = localStorage.getItem(SAVED_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+
+  function isSaved(id) { return savedIds().indexOf(id) !== -1; }
+
+  function toggleSaved(id) {
+    var ids = savedIds();
+    var i = ids.indexOf(id);
+    if (i >= 0) { ids.splice(i, 1); } else { ids.push(id); }
+    try { localStorage.setItem(SAVED_KEY, JSON.stringify(ids)); } catch (e) { /* storage full or blocked */ }
+    refreshSavedUI();
+  }
+
+  function refreshSavedUI() {
+    var ids = savedIds();
+    $("saved-count").textContent = ids.length ? "(" + ids.length + ")" : "";
+    if (sheetStall) {
+      $("sheet-save").textContent = isSaved(sheetStall.id) ? "Saved. Tap to remove" : "Save this stall";
+    }
+    if (savedOpen) { renderSavedList(); }
+  }
+
+  function renderSavedList() {
+    var list = $("saved-list");
+    list.innerHTML = "";
+    var stalls = savedIds().map(function (id) { return stallById[id]; }).filter(Boolean);
+    if (!stalls.length) {
+      var li0 = document.createElement("li");
+      li0.className = "inspire-empty";
+      li0.textContent = "Nothing saved yet. Open any stall and tap Save this stall.";
+      list.appendChild(li0);
+      return;
+    }
+    stalls.forEach(function (s) {
+      var v = venueById[s.venue_id];
+      var li = document.createElement("li");
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "result-item";
+      btn.innerHTML =
+        "<p class='r-name'>" + esc(s.bib_name || s.name) + "</p>" +
+        "<p class='r-rating'>" + esc(ratingLine(s).short) + "</p>" +
+        "<p class='r-sub'>" + esc(s.dish || "Dish not tagged yet") + " &middot; " +
+        esc(v ? v.name : "") + (s.unit ? " &middot; " + esc(s.unit) : "") + "</p>";
+      btn.addEventListener("click", function () { openCuratedStall(s); });
+      li.appendChild(btn);
+      list.appendChild(li);
+    });
+  }
+
+  $("saved-btn").addEventListener("click", function () {
+    savedOpen = !savedOpen;
+    $("saved-wrap").classList.toggle("hidden", !savedOpen);
+    if (savedOpen) { renderSavedList(); }
+  });
+
+  $("sheet-save").addEventListener("click", function () {
+    if (sheetStall) { toggleSaved(sheetStall.id); }
+  });
+
   /* ---------- screen 2: map ---------- */
 
   // Simple 2D basemap: OpenFreeMap vector tiles (free, no API key).
@@ -240,6 +387,8 @@
     $("mode-venues").addEventListener("click", function () { setPinMode("venues"); });
     $("back-btn").addEventListener("click", function () { showScreen("picker-screen"); });
     $("near-btn").addEventListener("click", nearMe);
+    $("tab-bib").addEventListener("click", function () { setInspireTab("bib"); });
+    $("tab-author").addEventListener("click", function () { setInspireTab("author"); });
   }
 
   function setPinMode(mode) {
@@ -251,12 +400,44 @@
     renderPins();
   }
 
+  /* ---------- shareable links (?dish=, ?stall=) ---------- */
+
+  function setShareParam(key, value) {
+    try {
+      var u = new URL(window.location.href);
+      if (value) { u.searchParams.set(key, value); } else { u.searchParams.delete(key); }
+      history.replaceState(null, "", u.toString());
+    } catch (e) { /* file:// or exotic URL: links just stay plain */ }
+  }
+
+  function handleDeepLink() {
+    var params;
+    try { params = new URLSearchParams(window.location.search); } catch (e) { return; }
+    var stallId = params.get("stall");
+    var dishParam = params.get("dish");
+    if (stallId && stallById[stallId]) {
+      var s = stallById[stallId];
+      if (s.dish) { pickDish(s.dish); } else {
+        currentDish = null;
+        $("map-title").textContent = s.bib_name || s.name;
+        showScreen("map-screen");
+        renderPins();
+      }
+      openSheet(s);
+      return;
+    }
+    if (dishParam && data.taxonomy.indexOf(dishParam) !== -1) {
+      pickDish(dishParam);
+    }
+  }
+
   function pickDish(dish) {
     currentDish = dish;
     $("map-title").textContent = dish;
     $("dish-suggestions").classList.add("hidden");
     showScreen("map-screen");
     renderPins();
+    setShareParam("dish", dish);
     // Location is only requested when the user taps Near me.
   }
 
@@ -395,7 +576,7 @@
           // still loading, MapLibre never pumps the animation frames
           // and the map looks dead. jumpTo always lands.
           var target = Math.min(CLUSTER_OFF_ZOOM,
-            Math.max(cam.zoom, map.getZoom() + 1.75));
+            Math.max(cam.zoom + 0.25, map.getZoom() + 1.75));
           map.jumpTo({ center: cam.center, zoom: target });
         });
         markers.push(cm);
@@ -545,6 +726,9 @@
     var q = encodeURIComponent(stall.name + ", " + stall.address);
     $("sheet-directions").href = "https://www.google.com/maps/search/?api=1&query=" + q;
 
+    // Update the save button for this stall.
+    $("sheet-save").textContent = isSaved(stall.id) ? "Saved. Tap to remove" : "Save this stall";
+
     // Reset the tagging UI.
     $("tag-form").classList.add("hidden");
     $("tag-open").classList.remove("hidden");
@@ -553,12 +737,23 @@
 
     $("sheet-scrim").classList.remove("hidden");
     $("stall-sheet").classList.remove("hidden");
+    setShareParam("stall", stall.id);
+
+    // Keep the pin visible above the bottom sheet: shift the map so
+    // the stall sits above screen centre instead of behind the card.
+    if (map && v && typeof v.lng === "number" && typeof v.lat === "number") {
+      var off = window.innerWidth < 760
+        ? Math.round(map.getContainer().clientHeight * 0.16)
+        : 70;
+      map.jumpTo({ center: [v.lng, v.lat], offset: [0, -off] });
+    }
   }
 
   function closeSheet() {
     $("sheet-scrim").classList.add("hidden");
     $("stall-sheet").classList.add("hidden");
     sheetStall = null;
+    setShareParam("stall", null);
   }
 
   $("sheet-close").addEventListener("click", closeSheet);
