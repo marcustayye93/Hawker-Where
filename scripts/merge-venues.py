@@ -35,7 +35,7 @@ TAXONOMY = [
     "western food",
     "chee cheong fun", "porridge and congee", "duck rice", "kway chap",
     "chwee kueh", "tutu kueh", "putu piring", "rojak", "tau huay",
-    "cheng tng", "ice kacang", "cendol", "sugarcane juice", "kopi and teh",
+    "cheng tng", "ice kacang", "cendol", "sugarcane juice",
     "mixed vegetable rice", "zhi char", "claypot rice", "thunder tea rice",
     "fishball noodles", "ngoh hiang",
     "dumplings", "dim sum", "you tiao", "fried snacks", "pancake",
@@ -109,6 +109,48 @@ def load_venues():
     return venues
 
 
+NEW_RAW_FILES = [
+    "sfa_within_coffeeshop_raw.json",
+    "sfa_coffeeshop_eating_raw.json",
+    "sfa_ma_managed_raw.json",
+]
+
+
+def load_kopitiam_venues():
+    """Kopitiam/food-court venues geocoded by postal (geocode-kopitiam-venues.py)."""
+    path = DATA / "kopitiam_venues.json"
+    if not path.exists():
+        return []
+    out = []
+    for v in json.loads(path.read_text(encoding="utf-8"))["venues"]:
+        out.append({
+            "id": v["id"], "name": v["name"], "address": v["address"],
+            "lat": v["lat"], "lng": v["lng"],
+            "rating": None, "rating_count": None,
+            "closed": False, "closure_note": None,
+            "_postal": v["postal"], "_tokens": toks(v["name"]),
+        })
+    return out
+
+
+def load_new_stall_ids():
+    """Licence ids from the non-NEA pulls; these stalls match venues by
+    postal only (never the NEA fuzzy matcher, which was tuned for NEA
+    centre-name token overlap)."""
+    ids = set()
+    for fname in NEW_RAW_FILES:
+        path = DATA / fname
+        if not path.exists():
+            continue
+        rows = json.loads(path.read_text(encoding="utf-8"))
+        rows = rows["data"] if isinstance(rows, dict) else rows
+        for r in rows:
+            lic = (r.get("licenceNumber") or "").strip()
+            if lic:
+                ids.add(lic)
+    return ids
+
+
 def load_closures():
     """Return {venue-name-key: (closed_today, note)} matched loosely by name."""
     rows = list(csv.DictReader(open(DATA / "nea_closures.csv", encoding="utf-8-sig")))
@@ -144,10 +186,15 @@ def main():
     stalls = json.loads((DATA / "stalls_classified.json").read_text(encoding="utf-8"))
     review = json.loads((DATA / "review_queue.json").read_text(encoding="utf-8"))
     venues = load_venues()
+    kvenues = load_kopitiam_venues()
+    new_ids = load_new_stall_ids()
     closures = load_closures()
 
     by_postal = {}
     for v in venues:
+        by_postal.setdefault(v["_postal"], v)
+    # Kopitiam venues fill postals the NEA register does not claim.
+    for v in kvenues:
         by_postal.setdefault(v["_postal"], v)
 
     # Apply closures to venues.
@@ -157,7 +204,7 @@ def main():
         v["closed"], v["closure_note"] = closed, note
         n_closed += closed
 
-    by_id = {v["id"]: v for v in venues}
+    by_id = {v["id"]: v for v in venues + kvenues}
     venue_of = {}
 
     def fuzzy(address):
@@ -179,14 +226,18 @@ def main():
             vid = OVERRIDES[s["postal"]]
         elif s["postal"] in by_postal:
             vid = by_postal[s["postal"]]["id"]
-        else:
+        elif s["id"] not in new_ids:
             vid = fuzzy(s["address"])
         s["venue_id"] = vid
         venue_of[s["id"]] = vid
 
-    # Public venue records (internal keys stripped), stable order.
+    # Public venue records (internal keys stripped), stable order. NEA
+    # venues all ship (some legitimately have zero stalls); kopitiam
+    # venues ship only once a stall actually lands in them.
+    used_kvenues = {vid for vid in venue_of.values() if vid}
     pub_venues = []
-    for v in sorted(venues, key=lambda x: x["name"]):
+    for v in sorted(venues + [k for k in kvenues if k["id"] in used_kvenues],
+                    key=lambda x: x["name"]):
         pub_venues.append({k: v[k] for k in
                            ("id", "name", "address", "lat", "lng", "rating",
                             "rating_count", "closed", "closure_note")})

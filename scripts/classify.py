@@ -7,11 +7,13 @@ dish, dish_confidence, unit, postal, venue_id=null) and data/review_queue.json
 
 One-stall-one-dish rule: each stall has exactly one specialty dish, parsed
 from its trade name. Matching stages, in order:
-  1. beverage-only check (drinks stalls)
+  1. beverage-only check (drinks stalls stay untagged: the kopi/teh and
+     drinks dishes were removed 2026-10-05 per Marcus; drink stalls
+     remain in the data with no dish)
   2. brand rules (exact chain names with no dish word, per Marcus 2 Oct)
   3. alias phrases (specific dishes; multiple hits -> name-pass decides)
-  4. ordered fallback buckets (zi char, dessert, roast, kueh, named noodles,
-     kopi-teh stalls) with a noodle guard on the zi char rule
+  4. ordered fallback buckets (zi char, dessert, roast, kueh, named noodles)
+     with a noodle guard on the zi char rule
   5. single distinctive fragments (medium confidence)
   6. Marcus's ordered name-pass (his 2 Oct rule doc): first high hit is the
      dish, the rest are recorded as secondary hits
@@ -37,7 +39,7 @@ TAXONOMY = [
     "western food",
     "chee cheong fun", "porridge and congee", "duck rice", "kway chap",
     "chwee kueh", "tutu kueh", "putu piring", "rojak", "tau huay",
-    "cheng tng", "ice kacang", "cendol", "sugarcane juice", "kopi and teh",
+    "cheng tng", "ice kacang", "cendol", "sugarcane juice",
     "mixed vegetable rice", "zhi char", "claypot rice", "thunder tea rice",
     "fishball noodles", "ngoh hiang",
     "dumplings", "dim sum", "you tiao", "fried snacks", "pancake",
@@ -64,6 +66,11 @@ ALIASES = {
     "fried kway teow": "char kway teow",
     "hokkien mee": "hokkien mee",
     "hokkien noodle": "hokkien mee",
+    "hokkien prawn mee": "hokkien mee",
+    "hokkien prawn noodle": "hokkien mee",
+    "hokkien prawn": "hokkien mee",
+    "fried hokkien prawn": "hokkien mee",
+    "hokkien fried prawn": "hokkien mee",
     "laksa": "laksa",
     "bak chor mee": "bak chor mee",
     "minced meat noodle": "bak chor mee",
@@ -167,11 +174,6 @@ ALIASES = {
     "chendol": "cendol",
     "sugarcane": "sugarcane juice",
     "sugar cane": "sugarcane juice",
-    "kopi": "kopi and teh",
-    "teh": "kopi and teh",
-    "coffee": "kopi and teh",
-    "toast": "kopi and teh",
-    "kaya toast": "kopi and teh",
     "mixed vegetable rice": "mixed vegetable rice",
     "mixed veg rice": "mixed vegetable rice",
     "mixed vege": "mixed vegetable rice",
@@ -272,11 +274,10 @@ FRAGMENTS = {
     "char siew": "wanton mee",
 }
 
-# Beverage-only names -> "drinks" (not part of the dish taxonomy).
+# Beverage-only names are no longer a dish: the "drinks" and
+# "kopi and teh" dishes were removed 2026-10-05 (Marcus). Drink stalls
+# stay in the data untagged.
 DRINK_WORDS = ("drink", "drinks", "juice", "beverage", "bubble tea")
-
-# Kopi/teh-centric stalls: food phrase missing but beverage named.
-BEVERAGE_DISH = "kopi and teh"
 
 # --- Ordered fallback buckets (Marcus, 2 Oct). Medium confidence. ---
 
@@ -305,13 +306,8 @@ NOODLE_NAME_RULES = (
     ("kway teow", "char kway teow"),
     ("kuay teow", "char kway teow"),
 )
-KOPI_FALLBACK = (
-    ("cha shi", "kopi and teh"),
-    ("tea stall", "kopi and teh"),
-    ("sarabat", "kopi and teh"),
-    ("minuman", "kopi and teh"),
-    ("drinkstall", "drinks"),
-)
+# Kopi/teh fallback removed 2026-10-05 with the kopi and teh dish.
+KOPI_FALLBACK = ()
 
 # --- Marcus's name-pass (2 Oct, ordered rules doc) ---
 # Applied only when the stages above found no dish. First high hit wins;
@@ -340,9 +336,6 @@ NAME_PASS_RULES = [
     (["bakery", "bakehouse", "bakes", "confection", "confectionery",
       "pastry", "pastries", "muffin", "bread", "baguette", "pau",
       "pao dian", "tart", "puff", "crumb"], "bakery"),
-    (["coffee", "kopi", "ka fei", "kafei", "kopitiam", "teh tarik",
-      "tehtarik", "toast", "yin liao", "drinking stall", "drinking point",
-      "tea house", "tea cafe", "happy tea", "cha tan"], "kopi and teh"),
     (["you tiao", "youtiao", "fried dough"], "you tiao"),
     (["chwee kueh", "chwee kuey"], "chwee kueh"),
     (["chee cheong fun", "chee cheong", "cheong fun", "chang fen",
@@ -377,6 +370,7 @@ NAME_PASS_RULES = [
     (["ban mian", "ban main", "pan mee", "mee hoon kueh", "mee hoon kway",
       "mian fen guo", "you mian"], "ban mian"),
     (["laksa"], "laksa"),
+    (["hokkien mee", "hokkien prawn"], "hokkien mee"),
     (["prawn mee", "prawn noodle", "har mee", "hae mee",
       "shrimp noodle"], "prawn mee"),
     (["lor mee", "lormee"], "lor mee"),
@@ -387,7 +381,6 @@ NAME_PASS_RULES = [
     (["yong tau", "yong tou foo", "yong tau foo"], "yong tau foo"),
     (["beef noodle", "niu rou", "beef king"], "beef noodle"),
     (["kway teow", "kuay teow", "char kway", "guo tiao"], "char kway teow"),
-    (["hokkien mee", "hokkien prawn"], "hokkien mee"),
     (["fried oyster", "oyster omelette", "orh luak", "hao jian",
       "oyster"], "oyster omelette"),
     (["fried rice", "nasi goreng", "chao fan"], "fried rice"),
@@ -548,6 +541,10 @@ def classify(name):
         return None, None, [], None, [], None
 
     cuisine = _cuisine(normal)
+    # Beverage-only stalls (kopi/teh/drinks names with no food signal)
+    # stay untagged: those dishes were removed 2026-10-05 (Marcus).
+    if _beverage_only(normal):
+        return None, None, [], cuisine, [], None
     dish, conf, candidates = _classify_main(name, normal)
     if dish == "review":
         # Ambiguous to the main parser: Marcus's ordered rules pick the
@@ -567,15 +564,20 @@ def classify(name):
     return None, None, [], cuisine, [], None
 
 
+def _beverage_only(normal):
+    """True when the name signals only beverages (drink word present and
+    no food alias hit; a lone sugarcane hit does not count as food,
+    matching the pre-removal beverage check)."""
+    if not any(phrase_in(w, normal) for w in DRINK_WORDS):
+        return False
+    return not any(
+        phrase_in(a, normal) for a, d in ALIASES.items()
+        if d != "sugarcane juice"
+    )
+
+
 def _classify_main(name, normal):
     """Original name parser. Returns (dish, confidence); dish None = nothing."""
-    # Beverage-only check first (so "XYZ Drinks" never matches a food dish).
-    beverage = any(phrase_in(w, normal) for w in DRINK_WORDS)
-    if beverage and not any(
-        phrase_in(a, normal) for a, d in ALIASES.items() if d not in (BEVERAGE_DISH, "sugarcane juice")
-    ):
-        return "drinks", "high", []
-
     # Brand rules (chains whose names carry no dish word).
     for phrase, dish in BRAND_RULES:
         if phrase_in(phrase, normal):
@@ -599,7 +601,7 @@ def _classify_main(name, normal):
         # Single-stall-one-dish: ambiguous names go to the review queue.
         return "review", None, sorted(hits.keys())
 
-    # Ordered fallback buckets (zi char, dessert, roast, kueh, noodles, kopi).
+    # Ordered fallback buckets (zi char, dessert, roast, kueh, noodles).
     dish, conf = _fallback(normal)
     if dish:
         return dish, conf, []
