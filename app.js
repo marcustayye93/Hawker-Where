@@ -25,6 +25,7 @@
   var currentDish = null;
   var pinMode = "stalls";   // "stalls" | "venues"
   var inspireTab = "bib";   // "bib" | "author"
+  var inspireRegion = "all"; // bib region filter
   var userLoc = null;       // [lat, lng]
   var userMarker = null;    // MapLibre marker for the user's dot
   var sheetStall = null;
@@ -190,11 +191,29 @@
     return data.stalls.filter(function (s) { return s.bib; });
   }
 
+  // Region buckets from venue coordinates (Marcus, 5 Oct):
+  // north / south / east / west / central.
+  function regionOf(v) {
+    if (!v || v.lat == null || v.lng == null) return "central";
+    if (v.lat >= 1.395) return "north";
+    if (v.lng <= 103.755) return "west";
+    if (v.lng >= 103.895) return "east";
+    if (v.lat <= 1.29 && v.lng < 103.83) return "south";
+    return "central";
+  }
+
   function renderInspire() {
     var list = $("inspire-list");
     var note = $("inspire-note");
     $("tab-bib").classList.toggle("tab-on", inspireTab === "bib");
     $("tab-author").classList.toggle("tab-on", inspireTab === "author");
+    $("region-tabs").classList.toggle("hidden", inspireTab !== "bib");
+    Array.prototype.forEach.call(
+      document.querySelectorAll(".region-tab"),
+      function (b) {
+        b.classList.toggle("tab-on", b.getAttribute("data-region") === inspireRegion);
+      }
+    );
     var stalls = inspireStalls(inspireTab);
     list.innerHTML = "";
 
@@ -207,14 +226,32 @@
       return;
     }
 
+    var shown = stalls;
+    if (inspireTab === "bib" && inspireRegion !== "all") {
+      shown = stalls.filter(function (s) {
+        return regionOf(venueById[s.venue_id]) === inspireRegion;
+      });
+    }
+
     var names = {};
-    stalls.forEach(function (s) { names[s.bib_name || s.name] = true; });
+    shown.forEach(function (s) { names[s.bib_name || s.name] = true; });
     note.textContent = inspireTab === "bib"
       ? "Michelin Bib Gourmand 2026: " + Object.keys(names).length +
-        " hawker establishments on the map."
+        " hawker establishments on the map." +
+        (inspireRegion !== "all"
+          ? " (" + inspireRegion.charAt(0).toUpperCase() + inspireRegion.slice(1) + ")"
+          : "")
       : Object.keys(names).length + " hand picked stalls.";
 
-    stalls.slice().sort(function (a, b) {
+    if (!shown.length) {
+      var liE = document.createElement("li");
+      liE.className = "inspire-empty";
+      liE.textContent = "No Bib Gourmand stalls here yet.";
+      list.appendChild(liE);
+      return;
+    }
+
+    shown.slice().sort(function (a, b) {
       return (a.bib_name || a.name).localeCompare(b.bib_name || b.name);
     }).forEach(function (s) {
       var v = venueById[s.venue_id];
@@ -235,6 +272,11 @@
 
   function setInspireTab(tab) {
     inspireTab = tab;
+    renderInspire();
+  }
+
+  function setInspireRegion(region) {
+    inspireRegion = region;
     renderInspire();
   }
 
@@ -389,6 +431,14 @@
     $("near-btn").addEventListener("click", nearMe);
     $("tab-bib").addEventListener("click", function () { setInspireTab("bib"); });
     $("tab-author").addEventListener("click", function () { setInspireTab("author"); });
+    Array.prototype.forEach.call(
+      document.querySelectorAll(".region-tab"),
+      function (b) {
+        b.addEventListener("click", function () {
+          setInspireRegion(b.getAttribute("data-region"));
+        });
+      }
+    );
   }
 
   function setPinMode(mode) {

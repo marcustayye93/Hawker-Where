@@ -15,7 +15,7 @@
 <body>
   <header class="appbar">
     <a class="brand" href="./index.html">HawkerWhere</a>
-    <p class="tagline">One dish, every stall, rated.</p>
+    <p class="tagline">Your local dish companion</p>
   </header>
 
   <!-- Screen 1: dish search -->
@@ -37,6 +37,14 @@
       <div class="inspire-tabs" role="tablist" aria-label="Curated lists">
         <button type="button" id="tab-bib" class="inspire-tab tab-on" role="tab">Bib Gourmand</button>
         <button type="button" id="tab-author" class="inspire-tab" role="tab">Author's Pick</button>
+      </div>
+      <div id="region-tabs" class="region-tabs" role="tablist" aria-label="Region">
+        <button type="button" class="region-tab tab-on" data-region="all">All</button>
+        <button type="button" class="region-tab" data-region="north">North</button>
+        <button type="button" class="region-tab" data-region="south">South</button>
+        <button type="button" class="region-tab" data-region="east">East</button>
+        <button type="button" class="region-tab" data-region="west">West</button>
+        <button type="button" class="region-tab" data-region="central">Central</button>
       </div>
       <p id="inspire-note" class="meta"></p>
       <ul id="inspire-list" class="result-list inspire-list"></ul>
