@@ -11,6 +11,7 @@
   var SG_CENTER = [1.3521, 103.8198];
   var SG_ZOOM = 11;
   var DATA_URL = "./data/stalls.json";
+  var TAXONOMY_URL = "./data/taxonomy.json";
   var SAMPLE_URL = "./data/sample-stalls.json";
   var TAG_QUEUE_KEY = "hawkerwhere_tag_queue";
   var TAG_DAY_KEY = "hawkerwhere_tag_day";
@@ -23,6 +24,9 @@
   var markers = [];         // live map markers (MapLibre has no layer group)
   var venuePopup = null;    // shared popup for venue-mode pins
   var currentDish = null;
+  var currentVenueId = null; // set when browsing one venue from search
+  var pendingDish = null;    // dish picked before the full data arrived
+  var taxonomyMeta = null;   // light payload: { dishes, stall_count, venue_count }
   var pinMode = "stalls";   // "stalls" | "venues"
   var inspireTab = "bib";   // "bib" | "author"
   var inspireRegion = "all"; // bib region filter
@@ -83,6 +87,12 @@
   /* ---------- data load ---------- */
 
   function loadData() {
+    // Light file first: the picker and dish suggestions come alive
+    // while the full 2.1MB payload is still on its way.
+    fetch(TAXONOMY_URL)
+      .then(function (res) { if (!res.ok) throw new Error("taxonomy " + res.status); return res.json(); })
+      .then(function (t) { taxonomyMeta = t; if (!data) renderPicker("taxonomy"); })
+      .catch(function () { /* the full payload will render the picker */ });
     fetch(DATA_URL)
       .then(function (res) { if (!res.ok) throw new Error("stalls.json " + res.status); return res.json(); })
       .then(function (json) { boot(json, "live"); })
@@ -104,6 +114,11 @@
     initMap();
     showScreen("picker-screen");
     handleDeepLink();
+    if (pendingDish) {
+      var d = pendingDish;
+      pendingDish = null;
+      pickDish(d);
+    }
   }
 
   function showDataError() {
@@ -129,13 +144,21 @@
 
   /* ---------- screen 1: dish picker ---------- */
 
+  var searchBound = false;
+
   function renderPicker(source) {
+    var dishCount = data ? data.taxonomy.length
+      : (taxonomyMeta ? taxonomyMeta.dishes.length : 0);
+    var stallCount = data ? data.stalls.length
+      : (taxonomyMeta ? taxonomyMeta.stall_count : 0);
     var meta = $("picker-meta");
-    meta.textContent = data.taxonomy.length + " dishes, " +
-      fmtCount(data.stalls.length) + " stalls across Singapore." +
+    meta.textContent = dishCount + " dishes, " +
+      fmtCount(stallCount) + " stalls across Singapore." +
       (source === "sample" ? " Sample preview data." : "");
     var input = $("dish-search");
-    input.placeholder = "Search " + data.taxonomy.length + " dishes, e.g. laksa";
+    input.placeholder = "Search " + dishCount + " dishes, stalls and places";
+    if (searchBound) return;
+    searchBound = true;
     input.addEventListener("input", function () { renderSuggestions(input.value); });
     input.addEventListener("focus", function () { renderSuggestions(input.value); });
     input.addEventListener("keydown", function (e) {
@@ -146,39 +169,101 @@
     });
   }
 
-  // Live suggestions under the one search bar: as the user types,
-  // matching dishes appear; tapping one goes straight to the map.
+  function dishList() {
+    if (data) return data.taxonomy;
+    if (taxonomyMeta) return taxonomyMeta.dishes;
+    return [];
+  }
+
+  // Live suggestions under the one search bar: dishes first, then
+  // venues and stall names once the full payload has landed. The
+  // untagged stalls are invisible to dish search; venue and stall
+  // search is how a user reaches them ("I'm at Maxwell", "Tian Tian").
   function dishMatches(q) {
     q = q.trim().toLowerCase();
     if (!q) return [];
     var starts = [], contains = [];
-    data.taxonomy.forEach(function (dish) {
+    dishList().forEach(function (dish) {
       var d = dish.toLowerCase();
       if (d.indexOf(q) === 0) starts.push(dish);
       else if (d.indexOf(q) !== -1) contains.push(dish);
     });
-    return starts.concat(contains).slice(0, 8);
+    return starts.concat(contains).slice(0, 6);
+  }
+
+  function venueMatches(q) {
+    if (!data) return [];
+    q = q.trim().toLowerCase();
+    if (q.length < 2) return [];
+    var starts = [], contains = [];
+    data.venues.forEach(function (v) {
+      var n = v.name.toLowerCase();
+      if (n.indexOf(q) === 0) starts.push(v);
+      else if (n.indexOf(q) !== -1) contains.push(v);
+    });
+    return starts.concat(contains).slice(0, 3);
+  }
+
+  function stallMatches(q) {
+    if (!data) return [];
+    q = q.trim().toLowerCase();
+    if (q.length < 3) return [];
+    var hits = [];
+    for (var i = 0; i < data.stalls.length && hits.length < 4; i++) {
+      var s = data.stalls[i];
+      if (!s.name || /^unnamed/i.test(s.name)) continue;
+      if (s.name.toLowerCase().indexOf(q) !== -1) hits.push(s);
+    }
+    return hits;
   }
 
   function renderSuggestions(q) {
     var box = $("dish-suggestions");
-    var matches = dishMatches(q || "");
-    if (!matches.length) {
+    var dishes = dishMatches(q || "");
+    var venues = venueMatches(q || "");
+    var stalls = stallMatches(q || "");
+    if (!dishes.length && !venues.length && !stalls.length) {
       box.innerHTML = q && q.trim()
-        ? "<p class='suggest-empty'>No dish matches that yet.</p>" : "";
+        ? "<p class='suggest-empty'>Nothing matches that yet.</p>" : "";
       box.classList.toggle("hidden", !q || !q.trim());
       return;
     }
     box.innerHTML = "";
-    matches.forEach(function (dish) {
+    function addHead(text) {
+      var h = document.createElement("p");
+      h.className = "suggest-head";
+      h.textContent = text;
+      box.appendChild(h);
+    }
+    function addItem(main, sub, fn) {
       var b = document.createElement("button");
       b.type = "button";
       b.className = "suggest-item";
       b.setAttribute("role", "option");
-      b.innerHTML = "<span class='suggest-name'>" + esc(dish) + "</span>";
-      b.addEventListener("click", function () { pickDish(dish); });
+      b.innerHTML = "<span class='suggest-name'>" + esc(main) + "</span>" +
+        (sub ? "<span class='suggest-sub'>" + esc(sub) + "</span>" : "");
+      b.addEventListener("click", fn);
       box.appendChild(b);
-    });
+    }
+    if (dishes.length) {
+      dishes.forEach(function (dish) {
+        addItem(dish, "", function () { pickDish(dish); });
+      });
+    }
+    if (venues.length) {
+      addHead("Places");
+      venues.forEach(function (v) {
+        addItem(v.name, "", function () { pickVenue(v); });
+      });
+    }
+    if (stalls.length) {
+      addHead("Stalls");
+      stalls.forEach(function (s) {
+        var v = venueById[s.venue_id];
+        addItem(s.name, (s.dish || "dish not tagged") + (v ? " · " + v.name : ""),
+          function () { openCuratedStall(s); });
+      });
+    }
     box.classList.remove("hidden");
   }
 
@@ -287,6 +372,7 @@
       pickDish(s.dish);
     } else {
       currentDish = null;
+      currentVenueId = null;
       $("map-title").textContent = s.bib_name || s.name;
       showScreen("map-screen");
       renderPins();
@@ -464,16 +550,22 @@
     var params;
     try { params = new URLSearchParams(window.location.search); } catch (e) { return; }
     var stallId = params.get("stall");
+    var venueParam = params.get("venue");
     var dishParam = params.get("dish");
     if (stallId && stallById[stallId]) {
       var s = stallById[stallId];
       if (s.dish) { pickDish(s.dish); } else {
         currentDish = null;
+        currentVenueId = null;
         $("map-title").textContent = s.bib_name || s.name;
         showScreen("map-screen");
         renderPins();
       }
       openSheet(s);
+      return;
+    }
+    if (venueParam && venueById[venueParam]) {
+      pickVenue(venueById[venueParam]);
       return;
     }
     if (dishParam && data.taxonomy.indexOf(dishParam) !== -1) {
@@ -482,16 +574,37 @@
   }
 
   function pickDish(dish) {
+    if (!data) { pendingDish = dish; return; }
     currentDish = dish;
+    currentVenueId = null;
     $("map-title").textContent = dish;
     $("dish-suggestions").classList.add("hidden");
     showScreen("map-screen");
     renderPins();
     setShareParam("dish", dish);
+    setShareParam("venue", null);
     // Location is only requested when the user taps Near me.
   }
 
+  function pickVenue(v) {
+    if (!v) return;
+    currentDish = null;
+    currentVenueId = v.id;
+    $("map-title").textContent = v.name;
+    $("dish-suggestions").classList.add("hidden");
+    showScreen("map-screen");
+    renderPins();
+    if (map && typeof v.lat === "number" && typeof v.lng === "number") {
+      map.jumpTo({ center: [v.lng, v.lat], zoom: 16.5 });
+    }
+    setShareParam("venue", v.id);
+    setShareParam("dish", null);
+  }
+
   function filteredStalls() {
+    if (currentVenueId) {
+      return data.stalls.filter(function (s) { return s.venue_id === currentVenueId; });
+    }
     if (!currentDish) return data.stalls.slice();
     return data.stalls.filter(function (s) { return s.dish === currentDish; });
   }
@@ -649,20 +762,35 @@
   function sortKey(s) {
     // Weighted rating: a 5.0 from 3 reviews must not outrank a 4.7
     // backed by hundreds. Bayesian average against the dataset mean.
+    // Venue (centre) ratings sit in their own tier below every stall's
+    // own rating, with the centre's review count capped inside the
+    // weight, so a centre score can never masquerade as a stall score.
     // Unrated stalls last. Location never reorders this list.
-    if (s.rating == null) return [0, Infinity];
+    if (s.rating == null) return [2, 0];
     var c = s.rating_count || 0;
+    if (s.rating_source === "venue") c = Math.min(c, 10);
     var w = (s.rating * c + 3.9 * 25) / (c + 25);
-    return [0, -w];
+    return [s.rating_source === "venue" ? 1 : 0, -w];
   }
 
   function renderResultList(stalls) {
     var list = $("result-list");
     list.innerHTML = "";
-    stalls.slice().sort(function (a, b) {
+    var sorted = stalls.slice().sort(function (a, b) {
       var ka = sortKey(a), kb = sortKey(b);
       return ka[0] - kb[0] || ka[1] - kb[1];
-    }).slice(0, 30).forEach(function (s) {
+    }).slice(0, 30);
+    var seenTierBoundary = false;
+    sorted.forEach(function (s) {
+      // One quiet note where centre-rated stalls begin, so nobody
+      // mistakes a centre score for a stall score while scrolling.
+      if (!seenTierBoundary && s.rating != null && s.rating_source === "venue") {
+        seenTierBoundary = true;
+        var note = document.createElement("li");
+        note.className = "sort-note";
+        note.textContent = "Centre ratings below. The number is the food centre's, not the stall's.";
+        list.appendChild(note);
+      }
       var v = stallVenue(s);
       var li = document.createElement("li");
       var btn = document.createElement("button");
@@ -754,6 +882,17 @@
     };
   }
 
+  function dishSourceLine(stall) {
+    if (!stall.dish) return "";
+    var src = stall.dish_source || "";
+    if (src === "name" || src === "name_pass") return "Dish tagged from the stall name.";
+    if (src === "google_title") return "Dish tagged from the Google listing title.";
+    if (src === "brave_web" || src === "grok_web") return "Dish tagged from web sources.";
+    if (src === "bib_gourmand") return "Dish tagged from the Michelin Bib Gourmand listing.";
+    if (src === "licensee_transfer" || src === "name_transfer") return "Dish tagged from the licence record.";
+    return "";
+  }
+
   function openSheet(stall) {
     sheetStall = stall;
     var v = stallVenue(stall);
@@ -761,6 +900,15 @@
     $("sheet-name").textContent = stall.name;
     $("sheet-dish").textContent = stall.dish || "Dish not tagged yet";
     $("sheet-rating").innerHTML = ratingLine(stall).long;
+    $("sheet-source").textContent = dishSourceLine(stall);
+    var alsoEl = $("sheet-also");
+    if (stall.also && stall.also.length) {
+      alsoEl.textContent = "Also known for: " + stall.also.join(", ");
+      alsoEl.classList.remove("hidden");
+    } else {
+      alsoEl.textContent = "";
+      alsoEl.classList.add("hidden");
+    }
     $("sheet-venue").innerHTML = esc(v ? v.name : "") +
       (stall.unit ? " " + esc(stall.unit) : "") +
       "<br>" + esc(stall.address);
