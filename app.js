@@ -889,6 +889,7 @@
     if (src === "google_title") return "Dish tagged from the Google listing title.";
     if (src === "brave_web" || src === "grok_web") return "Dish tagged from web sources.";
     if (src === "bib_gourmand") return "Dish tagged from the Michelin Bib Gourmand listing.";
+    if (src === "correction") return "Dish corrected from local evidence.";
     if (src === "licensee_transfer" || src === "name_transfer") return "Dish tagged from the licence record.";
     return "";
   }
