@@ -512,7 +512,7 @@
     });
     // Airbnb pattern: pins re-cluster as the zoom changes.
     // (MapLibre takes one event type per registration, unlike Leaflet.)
-    map.on("moveend", function () { drawPins(false); });
+    map.on("moveend", function () { drawPins(false); syncListToViewport(); });
 
     $("mode-stalls").addEventListener("click", function () { setPinMode("stalls"); });
     $("mode-venues").addEventListener("click", function () { setPinMode("venues"); });
@@ -823,9 +823,8 @@
   function renderPins() {
     var stalls = filteredStalls();
     $("empty-state").classList.toggle("hidden", stalls.length > 0);
-    $("result-count").textContent = stalls.length + " stall" + (stalls.length === 1 ? "" : "s");
     drawPins(true);
-    renderResultList(stalls);
+    renderResultList(null);
   }
 
   /* ---------- result list (under the map) ---------- */
@@ -846,9 +845,44 @@
     return [s.rating_source === "venue" ? 1 : 0, -w];
   }
 
-  function renderResultList(stalls) {
+  // Keep the plain-text list in step with the map: whatever pins
+  // are in the current view are the stalls the list names. Rating
+  // order inside the view does not change; only the set does.
+  function syncListToViewport() {
+    if (!map || !data) return;
+    if (!$("map-screen").classList.contains("screen-active")) return;
+    var all = filteredStalls();
+    var b = map.getBounds();
+    var inView = all.filter(function (s) {
+      var v = stallVenue(s);
+      return v && v.lng >= b.getWest() && v.lng <= b.getEast() &&
+             v.lat >= b.getSouth() && v.lat <= b.getNorth();
+    });
+    if (inView.length === all.length) {
+      renderResultList(null);
+    } else {
+      renderResultList(inView, all.length);
+    }
+  }
+
+  function renderResultList(viewStalls, totalCount) {
+    var stalls = viewStalls || filteredStalls();
+    if (viewStalls && typeof totalCount === "number") {
+      $("result-count").textContent = stalls.length + " of " + totalCount +
+        " stalls in this view";
+    } else {
+      $("result-count").textContent = stalls.length + " stall" +
+        (stalls.length === 1 ? "" : "s");
+    }
     var list = $("result-list");
     list.innerHTML = "";
+    if (viewStalls && !stalls.length) {
+      var emptyLi = document.createElement("li");
+      emptyLi.className = "sort-note";
+      emptyLi.textContent = "Nothing for this dish in this part of the map yet. Zoom out or pan to see more stalls.";
+      list.appendChild(emptyLi);
+      return;
+    }
     var sorted = stalls.slice().sort(function (a, b) {
       var ka = sortKey(a), kb = sortKey(b);
       return ka[0] - kb[0] || ka[1] - kb[1];
@@ -914,10 +948,7 @@
         map.jumpTo({ center: [userLoc[1], userLoc[0]],
                      zoom: Math.max(map.getZoom(), 14.5) });
       }
-      var stalls = filteredStalls();
-      $("result-count").textContent = stalls.length +
-        " stall" + (stalls.length === 1 ? "" : "s");
-      renderResultList(stalls);
+      syncListToViewport();
     }, function () {
       btn.disabled = false;
       btn.textContent = "Near me";
@@ -930,7 +961,7 @@
       drawUserDot();
       if (map) map.jumpTo({ center: [userLoc[1], userLoc[0]],
                             zoom: Math.max(map.getZoom(), 14.5) });
-      renderResultList(filteredStalls());
+      syncListToViewport();
       return;
     }
     locateUser(true);
