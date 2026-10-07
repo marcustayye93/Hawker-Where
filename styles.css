@@ -410,7 +410,7 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
 }
 .sheet-also { font-size: 13.5px; color: var(--muted); margin: -4px 0 10px; }
 
-.result-item .r-rating::first-letter { color: var(--red); }
+.result-item .r-rating .star { color: var(--red); }
 
 /* Bottom sheet */
 .scrim {
@@ -469,12 +469,30 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
   background: var(--red); color: #fff; border: 0;
   font: inherit; font-size: 16px; font-weight: 700; cursor: pointer;
 }
+.landing-map-hint {
+  position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%);
+  background: #ffffff; color: var(--ink); font-size: 13px; font-weight: 600;
+  padding: 7px 14px; border-radius: 999px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+  pointer-events: none; white-space: nowrap; z-index: 3;
+}
 .saved-btn:active { background: #d90b3e; }
 .saved-wrap { margin: 8px 0 4px; }
 .tag-box { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 14px; }
 .tag-prompt { font-size: 14px; font-weight: 600; margin: 0 0 8px; }
 .tag-thanks { color: #008a05; font-weight: 600; font-size: 14px; margin: 10px 0 0; }
 
+#landing-map {
+  position: relative; height: 230px; margin: 4px 0 16px;
+  border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+  background: #f7f7f5; cursor: pointer;
+}
+#landing-map .maplibregl-canvas { cursor: pointer; }
+#landing-map .pin.cluster { width: 28px; height: 28px; font-size: 11px; border-width: 1.5px; }
+#landing-map .pin.cluster.c-md { width: 33px; height: 33px; font-size: 12px; }
+#landing-map .pin.cluster.c-lg { width: 38px; height: 38px; font-size: 13px; }
+@media (min-width: 760px) {
+  #landing-map { height: 260px; }
+}
 @media (min-width: 760px) {
   .appbar { padding: 16px 24px; }
 }

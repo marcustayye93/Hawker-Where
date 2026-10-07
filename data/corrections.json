@@ -1,1 +1,145 @@
-{"corrections":[{"also":["carrot cake","oyster omelette"],"dish":"hokkien mee","dish_confidence":"high","dish_evidence":"Owner photo at Ang Mo Kio 628 Market #01-76, 5 Oct 2026 (signboard: Sumo Fried Hokkien Prawn Mee; menu item 1 is the hokkien mee; items 2-5 carrot cake and oyster omelette). Register trade name was the plain 'Fried Hokkien Prawn Noodle'.","dish_source":"correction","id":"AM80176003","name":"Sumo Fried Hokkien Prawn Mee"},{"dish":"hokkien mee","dish_confidence":"high","dish_evidence":"Name fix 2026-10-05: 'Ho Ji Fried Hokkien Prawn Noodles' was tagged prawn mee by the old classifier rule order. Fried hokkien prawn mee is the fried dish.","dish_source":"correction","id":"AM70139002"},{"dish":"hokkien mee","dish_confidence":"medium","dish_evidence":"Name fix 2026-10-05: 'Toa Payoh Hokkien Prawn Mee' (Kim Keat Palm #01-36) was tagged prawn mee by the old rule order. 'Hokkien prawn mee' in Singapore stall naming denotes the fried dish; medium confidence, flip on contrary evidence.","dish_source":"correction","id":"TPA0136003"},{"dish":"hokkien mee","dish_confidence":"medium","dish_evidence":"Name fix 2026-10-05: 'Bedok Corner Hokkien Prawn Mee' was tagged prawn mee by the old rule order; 'Hokkien prawn mee' denotes the fried dish.","dish_source":"correction","id":"BEF0129002"},{"dish":"hokkien mee","dish_confidence":"high","dish_evidence":"Name fix 2026-10-05: 'YOU FU FRIED HOKKIEN PRAWN NOODLE' was tagged prawn mee by the old rule order.","dish_source":"correction","id":"SM102186003"},{"dish":"hokkien mee","dish_confidence":"high","dish_evidence":"Name fix 2026-10-05: 'BOON KENG FRIED HOKKIEN PRAWN MEE' was tagged prawn mee by the old rule order.","dish_source":"correction","id":"UB10173006"},{"dish":"hokkien mee","dish_confidence":"high","dish_evidence":"Name fix 2026-10-05: 'Fried Hokkien Prawn Noodle' was tagged prawn mee by the old rule order.","dish_source":"correction","id":"HG30123003"},{"dish":"hokkien mee","dish_confidence":"high","dish_evidence":"Name fix 2026-10-05: 'YouFu Fried Hokkien Prawn Noodles' was tagged prawn mee by the old rule order.","dish_source":"correction","id":"GMF0157005"},{"dish":"hokkien mee","dish_confidence":"high","dish_evidence":"Name fix 2026-10-05: 'Chia Keng Fried Hokkien Prawn Noodle' was tagged prawn mee by the old rule order.","dish_source":"correction","id":"CCF0102003"},{"dish":"hokkien mee","dish_confidence":"medium","dish_evidence":"Name fix 2026-10-05: 'Tian Fa Hokkien Prawn Noodle' was tagged prawn mee by the old rule order; 'Hokkien prawn noodle' denotes the fried dish.","dish_source":"correction","id":"RH20152003"},{"dish":"hokkien mee","dish_confidence":"high","dish_evidence":"Name fix 2026-10-05: 'Come Daily Fried Hokkien Prawn Mee' was tagged prawn mee by the old rule order.","dish_source":"correction","id":"TP10227002"},{"dish":"hokkien mee","dish_confidence":"high","dish_evidence":"Name fix 2026-10-05: 'Yi Ji Fried Hokkien Prawn Mee' was tagged prawn mee by the old rule order.","dish_source":"correction","id":"MWF039002"},{"dish":"hokkien mee","dish_confidence":"high","dish_evidence":"Name fix 2026-10-05: 'Traditional Queen St. Fried Hokkien Prawn Mee . Fried Kway Teow' was tagged prawn mee by the old rule order.","dish_source":"correction","id":"QS10161004"},{"dish":"hokkien mee","dish_confidence":"medium","dish_evidence":"Name fix 2026-10-05: 'Ho Huat Hokkien Prawn Mee' was tagged prawn mee by the old rule order; 'Hokkien prawn mee' denotes the fried dish.","dish_source":"correction","id":"BL201135003"},{"dish":"hokkien mee","dish_confidence":"high","dish_evidence":"Name fix 2026-10-05: 'Queen Street Fried Hokkien Prawn Noodle' was tagged prawn mee by the old rule order.","dish_source":"correction","id":"QS101104003"},{"dish":"hokkien mee","dish_confidence":"high","dish_evidence":"Name fix 2026-10-05: 'Wu Ba Ye Fried Hokkien Prawn Mee' was tagged prawn mee by the old rule order.","dish_source":"correction","id":"WE20147003"},{"dish":"hokkien mee","dish_confidence":"medium","dish_evidence":"Name fix 2026-10-05: 'Jin Jin Hokkien Prawn Noodle' was tagged prawn mee by the old rule order; 'Hokkien prawn noodle' denotes the fried dish.","dish_source":"correction","id":"AL10127003"}],"deliberately_unchanged":[{"dish":"prawn mee","id":"UC10267003","name":"The Old Stall Hokkien Street Famous Prawn Mee","why":"Hong Lim #02-67. Despite 'Hokkien' in the name, this is the 1943 Hokkien Street hae mee lineage: soup prawn noodles (DanielFoodDiary and Eatbook, both crawled Oct 2026). Name-based flip would be wrong here."}],"note":"Hand corrections applied to data/stalls.json by scripts/apply-corrections.py after payload merges. Each entry cites its evidence. Run order in the pipeline: merge-venues, merge-places, apply-bib, apply-corrections, make-taxonomy, gen-dish-pages."}
+{
+ "corrections": [
+  {
+   "also": [
+    "carrot cake",
+    "oyster omelette"
+   ],
+   "dish": "hokkien mee",
+   "dish_confidence": "high",
+   "dish_evidence": "Owner photo at Ang Mo Kio 628 Market #01-76, 5 Oct 2026 (signboard: Sumo Fried Hokkien Prawn Mee; menu item 1 is the hokkien mee; items 2-5 carrot cake and oyster omelette). Register trade name was the plain 'Fried Hokkien Prawn Noodle'.",
+   "dish_source": "correction",
+   "id": "AM80176003",
+   "name": "Sumo Fried Hokkien Prawn Mee"
+  },
+  {
+   "dish": "hokkien mee",
+   "dish_confidence": "high",
+   "dish_evidence": "Name fix 2026-10-05: 'Ho Ji Fried Hokkien Prawn Noodles' was tagged prawn mee by the old classifier rule order. Fried hokkien prawn mee is the fried dish.",
+   "dish_source": "correction",
+   "id": "AM70139002"
+  },
+  {
+   "dish": "hokkien mee",
+   "dish_confidence": "medium",
+   "dish_evidence": "Name fix 2026-10-05: 'Toa Payoh Hokkien Prawn Mee' (Kim Keat Palm #01-36) was tagged prawn mee by the old rule order. 'Hokkien prawn mee' in Singapore stall naming denotes the fried dish; medium confidence, flip on contrary evidence.",
+   "dish_source": "correction",
+   "id": "TPA0136003"
+  },
+  {
+   "dish": "hokkien mee",
+   "dish_confidence": "medium",
+   "dish_evidence": "Name fix 2026-10-05: 'Bedok Corner Hokkien Prawn Mee' was tagged prawn mee by the old rule order; 'Hokkien prawn mee' denotes the fried dish.",
+   "dish_source": "correction",
+   "id": "BEF0129002"
+  },
+  {
+   "dish": "hokkien mee",
+   "dish_confidence": "high",
+   "dish_evidence": "Name fix 2026-10-05: 'YOU FU FRIED HOKKIEN PRAWN NOODLE' was tagged prawn mee by the old rule order.",
+   "dish_source": "correction",
+   "id": "SM102186003"
+  },
+  {
+   "dish": "hokkien mee",
+   "dish_confidence": "high",
+   "dish_evidence": "Name fix 2026-10-05: 'BOON KENG FRIED HOKKIEN PRAWN MEE' was tagged prawn mee by the old rule order.",
+   "dish_source": "correction",
+   "id": "UB10173006"
+  },
+  {
+   "dish": "hokkien mee",
+   "dish_confidence": "high",
+   "dish_evidence": "Name fix 2026-10-05: 'Fried Hokkien Prawn Noodle' was tagged prawn mee by the old rule order.",
+   "dish_source": "correction",
+   "id": "HG30123003"
+  },
+  {
+   "dish": "hokkien mee",
+   "dish_confidence": "high",
+   "dish_evidence": "Name fix 2026-10-05: 'YouFu Fried Hokkien Prawn Noodles' was tagged prawn mee by the old rule order.",
+   "dish_source": "correction",
+   "id": "GMF0157005"
+  },
+  {
+   "dish": "hokkien mee",
+   "dish_confidence": "high",
+   "dish_evidence": "Name fix 2026-10-05: 'Chia Keng Fried Hokkien Prawn Noodle' was tagged prawn mee by the old rule order.",
+   "dish_source": "correction",
+   "id": "CCF0102003"
+  },
+  {
+   "dish": "hokkien mee",
+   "dish_confidence": "medium",
+   "dish_evidence": "Name fix 2026-10-05: 'Tian Fa Hokkien Prawn Noodle' was tagged prawn mee by the old rule order; 'Hokkien prawn noodle' denotes the fried dish.",
+   "dish_source": "correction",
+   "id": "RH20152003"
+  },
+  {
+   "dish": "hokkien mee",
+   "dish_confidence": "high",
+   "dish_evidence": "Name fix 2026-10-05: 'Come Daily Fried Hokkien Prawn Mee' was tagged prawn mee by the old rule order.",
+   "dish_source": "correction",
+   "id": "TP10227002"
+  },
+  {
+   "dish": "hokkien mee",
+   "dish_confidence": "high",
+   "dish_evidence": "Name fix 2026-10-05: 'Yi Ji Fried Hokkien Prawn Mee' was tagged prawn mee by the old rule order.",
+   "dish_source": "correction",
+   "id": "MWF039002"
+  },
+  {
+   "dish": "hokkien mee",
+   "dish_confidence": "high",
+   "dish_evidence": "Name fix 2026-10-05: 'Traditional Queen St. Fried Hokkien Prawn Mee . Fried Kway Teow' was tagged prawn mee by the old rule order.",
+   "dish_source": "correction",
+   "id": "QS10161004"
+  },
+  {
+   "dish": "hokkien mee",
+   "dish_confidence": "medium",
+   "dish_evidence": "Name fix 2026-10-05: 'Ho Huat Hokkien Prawn Mee' was tagged prawn mee by the old rule order; 'Hokkien prawn mee' denotes the fried dish.",
+   "dish_source": "correction",
+   "id": "BL201135003"
+  },
+  {
+   "dish": "hokkien mee",
+   "dish_confidence": "high",
+   "dish_evidence": "Name fix 2026-10-05: 'Queen Street Fried Hokkien Prawn Noodle' was tagged prawn mee by the old rule order.",
+   "dish_source": "correction",
+   "id": "QS101104003"
+  },
+  {
+   "dish": "hokkien mee",
+   "dish_confidence": "high",
+   "dish_evidence": "Name fix 2026-10-05: 'Wu Ba Ye Fried Hokkien Prawn Mee' was tagged prawn mee by the old rule order.",
+   "dish_source": "correction",
+   "id": "WE20147003"
+  },
+  {
+   "dish": "hokkien mee",
+   "dish_confidence": "medium",
+   "dish_evidence": "Name fix 2026-10-05: 'Jin Jin Hokkien Prawn Noodle' was tagged prawn mee by the old rule order; 'Hokkien prawn noodle' denotes the fried dish.",
+   "dish_source": "correction",
+   "id": "AL10127003"
+  },
+  {
+   "id": "ADF0127003",
+   "name": "Adam Rd Noo Cheng Big Prawn Noodle",
+   "dish": "prawn mee",
+   "dish_confidence": "high",
+   "dish_source": "correction",
+   "dish_evidence": "Michelin Bib Gourmand 2026 hawker match (data/bib_gourmand.json) names this #01-27 record 'Adam Rd Noo Cheng Big Prawn Noodle'; the SFA register record itself is an unnamed stall, so it showed 'Dish not tagged yet' with no searchable name. Spotted by Marcus 2026-10-07."
+  }
+ ],
+ "deliberately_unchanged": [
+  {
+   "dish": "prawn mee",
+   "id": "UC10267003",
+   "name": "The Old Stall Hokkien Street Famous Prawn Mee",
+   "why": "Hong Lim #02-67. Despite 'Hokkien' in the name, this is the 1943 Hokkien Street hae mee lineage: soup prawn noodles (DanielFoodDiary and Eatbook, both crawled Oct 2026). Name-based flip would be wrong here."
+  }
+ ],
+ "note": "Hand corrections applied to data/stalls.json by scripts/apply-corrections.py after payload merges. Each entry cites its evidence. Run order in the pipeline: merge-venues, merge-places, apply-bib, apply-corrections, make-taxonomy, gen-dish-pages."
+}

@@ -112,6 +112,7 @@
     renderInspire();
     refreshSavedUI();
     initMap();
+    initLandingMap();
     showScreen("picker-screen");
     handleDeepLink();
     if (pendingDish) {
@@ -346,7 +347,7 @@
       btn.className = "result-item";
       btn.innerHTML =
         "<p class='r-name'>" + esc(s.bib_name || s.name) + "</p>" +
-        "<p class='r-rating'>" + esc(ratingLine(s).short) + "</p>" +
+        "<p class='r-rating'>" + ratingShortHtml(s) + "</p>" +
         "<p class='r-sub'>" + esc(s.dish || "Dish not tagged yet") + " &middot; " +
         esc(v ? v.name : "") + (s.unit ? " &middot; " + esc(s.unit) : "") + "</p>";
       btn.addEventListener("click", function () { openCuratedStall(s); });
@@ -431,7 +432,7 @@
       btn.className = "result-item";
       btn.innerHTML =
         "<p class='r-name'>" + esc(s.bib_name || s.name) + "</p>" +
-        "<p class='r-rating'>" + esc(ratingLine(s).short) + "</p>" +
+        "<p class='r-rating'>" + ratingShortHtml(s) + "</p>" +
         "<p class='r-sub'>" + esc(s.dish || "Dish not tagged yet") + " &middot; " +
         esc(v ? v.name : "") + (s.unit ? " &middot; " + esc(s.unit) : "") + "</p>";
       btn.addEventListener("click", function () { openCuratedStall(s); });
@@ -461,31 +462,33 @@
   var MAP_HIDE_LAYERS = ["airport", "highway-shield-non-us",
     "highway-shield-us-interstate", "road_shield_us"];
 
-  function neutralizeBasemap() {
-    var layers = (map.getStyle() && map.getStyle().layers) || [];
+  function neutralizeBasemap(m) {
+    m = m || map;
+    if (!m) return;
+    var layers = (m.getStyle() && m.getStyle().layers) || [];
     layers.forEach(function (layer) {
       try {
         if (layer.type === "background") {
-          map.setPaintProperty(layer.id, "background-color", "#f7f7f5");
+          m.setPaintProperty(layer.id, "background-color", "#f7f7f5");
         } else if (layer.type === "fill") {
           if (layer.id === "water") {
-            map.setPaintProperty(layer.id, "fill-color", "#d9dee1");
+            m.setPaintProperty(layer.id, "fill-color", "#d9dee1");
           } else if (layer.id === "park" || layer.id.indexOf("landcover") === 0) {
-            map.setPaintProperty(layer.id, "fill-color", "#e9ebe9");
+            m.setPaintProperty(layer.id, "fill-color", "#e9ebe9");
           } else if (layer.id === "building") {
-            map.setPaintProperty(layer.id, "fill-color", "#e9e9e6");
-            map.setPaintProperty(layer.id, "fill-outline-color", "#d7d7d4");
+            m.setPaintProperty(layer.id, "fill-color", "#e9e9e6");
+            m.setPaintProperty(layer.id, "fill-outline-color", "#d7d7d4");
           } else {
-            map.setPaintProperty(layer.id, "fill-color", "#efefed");
+            m.setPaintProperty(layer.id, "fill-color", "#efefed");
           }
         } else if (layer.type === "line") {
           if (layer.id === "waterway") {
-            map.setPaintProperty(layer.id, "line-color", "#c2ccd0");
+            m.setPaintProperty(layer.id, "line-color", "#c2ccd0");
           }
         } else if (layer.type === "symbol") {
           var text = layer.id.indexOf("water") === 0 ? "#7d868c" : "#444444";
-          map.setPaintProperty(layer.id, "text-color", text);
-          map.setPaintProperty(layer.id, "text-halo-color", "#ffffff");
+          m.setPaintProperty(layer.id, "text-color", text);
+          m.setPaintProperty(layer.id, "text-halo-color", "#ffffff");
         }
       } catch (e) { /* one layer failing must not stop the rest */ }
     });
@@ -525,6 +528,76 @@
         });
       }
     );
+  }
+
+  /* ---------- landing mini-map (teaser) ---------- */
+
+  var landingMap = null;
+
+  function initLandingMap() {
+    var box = $("landing-map");
+    if (!box || landingMap || typeof maplibregl === "undefined") return;
+    var activate = function () {
+      var input = $("dish-search");
+      input.scrollIntoView({ behavior: "smooth", block: "center" });
+      window.setTimeout(function () { input.focus({ preventScroll: true }); }, 350);
+    };
+    box.addEventListener("click", activate);
+    box.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(); }
+    });
+    try {
+      landingMap = new maplibregl.Map({
+        container: "landing-map",
+        style: MAP_STYLE,
+        center: [SG_CENTER[1], SG_CENTER[0]],
+        zoom: 9.6,
+        interactive: false,
+        attributionControl: { compact: true }
+      });
+    } catch (e) {
+      landingMap = null;
+      return;
+    }
+    landingMap.on("load", function () {
+      MAP_HIDE_LAYERS.forEach(function (id) {
+        if (landingMap.getLayer(id)) {
+          landingMap.setLayoutProperty(id, "visibility", "none");
+        }
+      });
+      neutralizeBasemap(landingMap);
+      renderLandingBadges();
+    });
+  }
+
+  function renderLandingBadges() {
+    if (!landingMap || !data) return;
+    var perVenue = {};
+    data.stalls.forEach(function (s) {
+      perVenue[s.venue_id] = (perVenue[s.venue_id] || 0) + 1;
+    });
+    var pts = [];
+    data.venues.forEach(function (v) {
+      var n = perVenue[v.id] || 0;
+      if (n && v.lat && v.lng) pts.push({ pos: [v.lat, v.lng], n: n });
+    });
+    var groups = [];
+    pts.forEach(function (p) {
+      var px = landingMap.project([p.pos[1], p.pos[0]]);
+      var hit = null;
+      for (var i = 0; i < groups.length; i++) {
+        var dx = groups[i].px.x - px.x, dy = groups[i].px.y - px.y;
+        if (dx * dx + dy * dy <= 56 * 56) { hit = groups[i]; break; }
+      }
+      if (!hit) { hit = { px: px, pos: p.pos, n: 0 }; groups.push(hit); }
+      hit.n += p.n;
+    });
+    groups.forEach(function (g) {
+      var el = document.createElement("div");
+      el.innerHTML = clusterHtml(g.n);
+      new maplibregl.Marker({ element: el, anchor: "center" })
+        .setLngLat([g.pos[1], g.pos[0]]).addTo(landingMap);
+    });
   }
 
   function setPinMode(mode) {
@@ -802,7 +875,7 @@
       }
       btn.innerHTML =
         "<p class='r-name'>" + esc(s.name) + "</p>" +
-        "<p class='r-rating'>" + esc(ratingLine(s).short) + "</p>" +
+        "<p class='r-rating'>" + ratingShortHtml(s) + "</p>" +
         "<p class='r-sub'>" + esc(s.dish || "Dish not tagged yet") + " &middot; " + esc(v ? v.name : "") + dist + "</p>";
       btn.addEventListener("click", function () { openSheet(s); });
       li.appendChild(btn);
@@ -864,6 +937,14 @@
   }
 
   /* ---------- stall card (bottom sheet) ---------- */
+
+  function ratingShortHtml(stall) {
+    var line = ratingLine(stall).short;
+    if (line.charAt(0) === "\u2605") {
+      return "<span class='star'>\u2605</span>" + esc(line.slice(1));
+    }
+    return esc(line);
+  }
 
   function ratingLine(stall) {
     if (stall.rating_source === "venue") {
