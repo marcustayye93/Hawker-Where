@@ -17,8 +17,8 @@ def main():
         d = json.load(f)
     t = {
         "dishes": d["taxonomy"],
-        "stall_count": len(d["stalls"]),
-        "venue_count": len(d["venues"]),
+        "stall_count": len([s for s in d["stalls"] if not s.get("author_manual")]),
+        "venue_count": len([v for v in d["venues"] if not v["id"].startswith("authors-pick-")]),
         "generated": d.get("generated"),
     }
     out = os.path.join(DATA, "taxonomy.json")

@@ -1,0 +1,86 @@
+{
+ "existing": [
+  {
+   "cuisine_label": "Hokkien Mee",
+   "dish": "hokkien mee",
+   "evidence": "SFA record THE NEIGHBOURWOK at 177 Bukit Batok West Avenue 8 #01-247; public listings describe the stall as a Hokkien mee stall.",
+   "name": "The Neighbourwok",
+   "stall_id": "SW22E60K000",
+   "order": 1
+  },
+  {
+   "cuisine_label": "Hainanese chicken rice",
+   "dish": "chicken rice",
+   "evidence": "SFA record WEE KIM HAINESE CHICKEN RICE at Yishun Park Hawker Centre #01-32; the centre's own hawker page lists Wee Kim Hainanese Chicken Rice at #01-32.",
+   "name": "Wee Kim Hainanese Chicken Rice",
+   "stall_id": "Y510132003",
+   "order": 5
+  }
+ ],
+ "manual": [
+  {
+   "stall": {
+    "address": "2 Sixth Avenue, Singapore 276470",
+    "cuisine": "Western",
+    "cuisine_label": "Western food",
+    "dish": null,
+    "evidence": "Lazy Lizard's own site lists Lazy Lizard Sixth Avenue at 2 Sixth Ave, Singapore 276470, and describes Sixth Avenue as the original bistro bar location.",
+    "id": "authors-pick-lazy-lizard-sixth-avenue",
+    "name": "Lazy Lizard Sixth Avenue",
+    "postal": "276470",
+    "unit": null
+   },
+   "venue": {
+    "address": "2 Sixth Avenue, Singapore 276470",
+    "id": "authors-pick-lazy-lizard-sixth-avenue",
+    "lat": 1.331204,
+    "lng": 103.795148,
+    "name": "Lazy Lizard Sixth Avenue"
+   },
+   "order": 2
+  },
+  {
+   "stall": {
+    "address": "12 Jalan Kelulut, Seletar Hills Estate, Singapore 809030",
+    "cuisine": "Italian",
+    "cuisine_label": "Italian food",
+    "dish": null,
+    "evidence": "Pietro's own contact page lists Pietro Ristorante Italiano at 12 Jalan Kelulut, Seletar Hills Estate, Singapore 809030.",
+    "id": "authors-pick-pietro-ristorante-italiano",
+    "name": "Pietro Ristorante Italiano",
+    "postal": "809030",
+    "unit": null
+   },
+   "venue": {
+    "address": "12 Jalan Kelulut, Seletar Hills Estate, Singapore 809030",
+    "id": "authors-pick-pietro-ristorante-italiano",
+    "lat": 1.38341,
+    "lng": 103.876053,
+    "name": "Pietro Ristorante Italiano"
+   },
+   "order": 3
+  },
+  {
+   "stall": {
+    "address": "22 Upper Cross Street, Singapore 058334",
+    "cuisine": "Chinese regional",
+    "cuisine_label": "China food",
+    "dish": null,
+    "evidence": "Public listings place Dong Bei Ren Jia at 22 Upper Cross Street, Singapore 058334. This is not the payload stall DONG BEI CAI at People's Park Food Centre.",
+    "id": "authors-pick-dong-bei-ren-jia",
+    "name": "Dong Bei Ren Jia",
+    "postal": "058334",
+    "unit": null
+   },
+   "venue": {
+    "address": "22 Upper Cross Street, Singapore 058334",
+    "id": "authors-pick-dong-bei-ren-jia",
+    "lat": 1.283901,
+    "lng": 103.845286,
+    "name": "Dong Bei Ren Jia"
+   },
+   "order": 4
+  }
+ ],
+ "note": "Author's Pick listings supplied by Marcus on 2026-10-07 and 2026-10-08. This batch lists the specific or flagship location for each name. Applied by scripts/apply-authors-picks.py after apply-corrections.py, before make-taxonomy.py and gen-dish-pages.py. Manual listings are marked author_manual so the headline stall count and dish pages stay register-based."
+}

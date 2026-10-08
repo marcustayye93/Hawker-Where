@@ -150,7 +150,7 @@
   function renderPicker(source) {
     var dishCount = data ? data.taxonomy.length
       : (taxonomyMeta ? taxonomyMeta.dishes.length : 0);
-    var stallCount = data ? data.stalls.length
+    var stallCount = data ? data.stalls.filter(function (s) { return !s.author_manual; }).length
       : (taxonomyMeta ? taxonomyMeta.stall_count : 0);
     var meta = $("picker-meta");
     meta.textContent = dishCount + " dishes, " +
@@ -261,7 +261,7 @@
       addHead("Stalls");
       stalls.forEach(function (s) {
         var v = venueById[s.venue_id];
-        addItem(s.name, (s.dish || "dish not tagged") + (v ? " · " + v.name : ""),
+        addItem(s.author_name || s.name, (s.author_cuisine || s.dish || "dish not tagged") + (v ? " · " + v.name : ""),
           function () { openCuratedStall(s); });
       });
     }
@@ -320,20 +320,61 @@
     }
 
     var names = {};
-    shown.forEach(function (s) { names[s.bib_name || s.name] = true; });
+    shown.forEach(function (s) { names[s.author_name || s.bib_name || s.name] = true; });
     note.textContent = inspireTab === "bib"
       ? "Michelin Bib Gourmand 2026: " + Object.keys(names).length +
         " hawker establishments on the map." +
         (inspireRegion !== "all"
           ? " (" + inspireRegion.charAt(0).toUpperCase() + inspireRegion.slice(1) + ")"
           : "")
-      : Object.keys(names).length + " hand picked stalls.";
+      : shown.length + " hand picked places.";
 
     if (!shown.length) {
       var liE = document.createElement("li");
       liE.className = "inspire-empty";
       liE.textContent = "No Bib Gourmand stalls here yet.";
       list.appendChild(liE);
+      return;
+    }
+
+    if (inspireTab === "author") {
+      var regionOrder = ["north", "south", "east", "west", "central"];
+      var regionLabels = {
+        north: "North", south: "South", east: "East", west: "West", central: "Central"
+      };
+      var byRegion = {};
+      shown.forEach(function (s) {
+        var r = regionOf(venueById[s.venue_id]);
+        if (!byRegion[r]) byRegion[r] = [];
+        byRegion[r].push(s);
+      });
+      regionOrder.forEach(function (r) {
+        var group = byRegion[r];
+        if (!group || !group.length) return;
+        var head = document.createElement("li");
+        head.className = "inspire-region";
+        head.textContent = regionLabels[r];
+        list.appendChild(head);
+        group.slice().sort(function (a, b) {
+          var ao = a.author_order == null ? 99 : a.author_order;
+          var bo = b.author_order == null ? 99 : b.author_order;
+          return ao - bo || (a.author_name || a.name).localeCompare(b.author_name || b.name);
+        }).forEach(function (s) {
+          var v = venueById[s.venue_id];
+          var li = document.createElement("li");
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "result-item";
+          btn.innerHTML =
+            "<p class='r-name'>" + esc(s.author_name || s.name) + "</p>" +
+            "<p class='r-rating'>" + ratingShortHtml(s) + "</p>" +
+            "<p class='r-cuisine'>" + esc(s.author_cuisine || s.dish || "Cuisine not tagged yet") + "</p>" +
+            "<p class='r-sub'>" + esc(s.author_manual ? (v ? v.address : "") : (v ? v.name : "")) + (s.unit ? " &middot; " + esc(s.unit) : "") + "</p>";
+          btn.addEventListener("click", function () { openAuthorPick(s); });
+          li.appendChild(btn);
+          list.appendChild(li);
+        });
+      });
       return;
     }
 
@@ -366,9 +407,31 @@
     renderInspire();
   }
 
+  // An Author's Pick card goes to the place itself, not the whole
+  // dish category, then opens the place card.
+  function openAuthorPick(s) {
+    var v = venueById[s.venue_id];
+    currentDish = null;
+    currentVenueId = s.venue_id;
+    $("map-title").textContent = s.author_name || s.name;
+    $("dish-suggestions").classList.add("hidden");
+    showScreen("map-screen");
+    renderPins();
+    if (map && v && typeof v.lat === "number" && typeof v.lng === "number") {
+      map.jumpTo({ center: [v.lng, v.lat], zoom: 16.5 });
+    }
+    setShareParam("venue", s.venue_id);
+    setShareParam("dish", null);
+    openSheet(s);
+  }
+
   // A curated card goes to the map on the stall's own dish filter,
   // then opens the stall card.
   function openCuratedStall(s) {
+    if (s.author_pick) {
+      openAuthorPick(s);
+      return;
+    }
     if (s.dish) {
       pickDish(s.dish);
     } else {
@@ -396,6 +459,12 @@
 
   function isSaved(id) { return savedIds().indexOf(id) !== -1; }
 
+  function saveLabel(stall) {
+    if (!stall) return "Save this stall";
+    return isSaved(stall.id) ? "Saved. Tap to remove"
+      : (stall.author_manual ? "Save this place" : "Save this stall");
+  }
+
   function toggleSaved(id) {
     var ids = savedIds();
     var i = ids.indexOf(id);
@@ -408,7 +477,7 @@
     var ids = savedIds();
     $("saved-count").textContent = ids.length ? "(" + ids.length + ")" : "";
     if (sheetStall) {
-      $("sheet-save").textContent = isSaved(sheetStall.id) ? "Saved. Tap to remove" : "Save this stall";
+      $("sheet-save").textContent = saveLabel(sheetStall);
     }
     if (savedOpen) { renderSavedList(); }
   }
@@ -431,9 +500,9 @@
       btn.type = "button";
       btn.className = "result-item";
       btn.innerHTML =
-        "<p class='r-name'>" + esc(s.bib_name || s.name) + "</p>" +
+        "<p class='r-name'>" + esc(s.author_name || s.bib_name || s.name) + "</p>" +
         "<p class='r-rating'>" + ratingShortHtml(s) + "</p>" +
-        "<p class='r-sub'>" + esc(s.dish || "Dish not tagged yet") + " &middot; " +
+        "<p class='r-sub'>" + esc(s.author_cuisine || s.dish || "Dish not tagged yet") + " &middot; " +
         esc(v ? v.name : "") + (s.unit ? " &middot; " + esc(s.unit) : "") + "</p>";
       btn.addEventListener("click", function () { openCuratedStall(s); });
       li.appendChild(btn);
@@ -867,11 +936,12 @@
 
   function renderResultList(viewStalls, totalCount) {
     var stalls = viewStalls || filteredStalls();
+    var noun = (currentVenueId && currentVenueId.indexOf("authors-pick-") === 0) ? "place" : "stall";
     if (viewStalls && typeof totalCount === "number") {
       $("result-count").textContent = stalls.length + " of " + totalCount +
-        " stalls in this view";
+        " " + noun + "s in this view";
     } else {
-      $("result-count").textContent = stalls.length + " stall" +
+      $("result-count").textContent = stalls.length + " " + noun +
         (stalls.length === 1 ? "" : "s");
     }
     var list = $("result-list");
@@ -995,6 +1065,7 @@
   }
 
   function dishSourceLine(stall) {
+    if (stall.author_pick) return "Author's Pick.";
     if (!stall.dish) return "";
     var src = stall.dish_source || "";
     if (src === "name" || src === "name_pass") return "Dish tagged from the stall name.";
@@ -1010,8 +1081,8 @@
     sheetStall = stall;
     var v = stallVenue(stall);
 
-    $("sheet-name").textContent = stall.name;
-    $("sheet-dish").textContent = stall.dish || "Dish not tagged yet";
+    $("sheet-name").textContent = stall.author_name || stall.name;
+    $("sheet-dish").textContent = stall.author_cuisine || stall.dish || "Dish not tagged yet";
     $("sheet-rating").innerHTML = ratingLine(stall).long;
     $("sheet-source").textContent = dishSourceLine(stall);
     var alsoEl = $("sheet-also");
@@ -1038,7 +1109,7 @@
     $("sheet-directions").href = "https://www.google.com/maps/search/?api=1&query=" + q;
 
     // Update the save button for this stall.
-    $("sheet-save").textContent = isSaved(stall.id) ? "Saved. Tap to remove" : "Save this stall";
+    $("sheet-save").textContent = saveLabel(stall);
 
     // Reset the tagging UI.
     $("tag-form").classList.add("hidden");

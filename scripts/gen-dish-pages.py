@@ -128,6 +128,8 @@ def main():
     venues_by_id = {v["id"]: v for v in d["venues"]}
     by_dish = {}
     for s in d["stalls"]:
+        if s.get("author_manual"):
+            continue
         if s.get("dish"):
             by_dish.setdefault(s["dish"], []).append(s)
 

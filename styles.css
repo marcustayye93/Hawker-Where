@@ -401,7 +401,16 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
 .result-item:hover { box-shadow: var(--shadow); }
 .result-item .r-name { font-weight: 600; font-size: 16px; margin: 0 0 4px; }
 .result-item .r-sub { color: var(--muted); font-size: 13.5px; margin: 0; }
+.result-item .r-cuisine { color: var(--red-ink); font-weight: 600; font-size: 13.5px; margin: 0 0 3px; }
 .result-item .r-rating { color: var(--ink); font-weight: 600; font-size: 14px; margin: 0 0 4px; }
+.inspire-region {
+  grid-column: 1 / -1;
+  list-style: none;
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  padding: 16px 4px 2px;
+}
 .sort-note {
   list-style: none;
   font-size: 12.5px;
