@@ -1199,8 +1199,26 @@
   /* ---------- PWA service worker ---------- */
 
   if ("serviceWorker" in navigator && location.protocol !== "file:") {
+    // If a newer worker takes control mid-session, reload once onto
+    // the fresh shell instead of running stale code until the user
+    // happens to fully close and reopen the app.
+    var swReloaded = false;
+    var hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener("controllerchange", function () {
+      if (!hadController || swReloaded) return;
+      swReloaded = true;
+      window.location.reload();
+    });
     window.addEventListener("load", function () {
-      navigator.serviceWorker.register("./sw.js").catch(function () { /* offline is best-effort */ });
+      navigator.serviceWorker.register("./sw.js").then(function (reg) {
+        // Long-lived PWA sessions may never navigate again; ask for
+        // an update check whenever the app comes back to the front.
+        document.addEventListener("visibilitychange", function () {
+          if (document.visibilityState === "visible") {
+            reg.update().catch(function () { /* best-effort */ });
+          }
+        });
+      }).catch(function () { /* offline is best-effort */ });
     });
   }
 
