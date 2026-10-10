@@ -338,6 +338,10 @@
     }
 
     if (inspireTab === "author") {
+      var intro = document.createElement("li");
+      intro.className = "inspire-intro";
+      intro.textContent = "Every pick here is food I stand behind. Not the tourist-famous names, just food that truly hits the spot for me, and I am glad to share it.";
+      list.appendChild(intro);
       var regionOrder = ["north", "south", "east", "west", "central"];
       var regionLabels = {
         north: "North", south: "South", east: "East", west: "West", central: "Central"

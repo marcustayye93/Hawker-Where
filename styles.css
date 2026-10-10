@@ -403,6 +403,14 @@ h2 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
 .result-item .r-sub { color: var(--muted); font-size: 13.5px; margin: 0; }
 .result-item .r-cuisine { color: var(--red-ink); font-weight: 600; font-size: 13.5px; margin: 0 0 3px; }
 .result-item .r-rating { color: var(--ink); font-weight: 600; font-size: 14px; margin: 0 0 4px; }
+.inspire-intro {
+  grid-column: 1 / -1;
+  list-style: none;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--muted);
+  padding: 8px 4px 4px;
+}
 .inspire-region {
   grid-column: 1 / -1;
   list-style: none;
