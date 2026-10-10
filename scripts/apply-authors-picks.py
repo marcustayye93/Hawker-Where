@@ -63,24 +63,31 @@ def main():
 
     venues_by_id = {v["id"]: v for v in payload["venues"]}
     for entry in cfg.get("manual", []):
-        v = entry["venue"]
-        if v["id"] in venues_by_id:
-            raise SystemExit(f"manual author venue id already exists: {v['id']}")
-        venue = {
-            "id": v["id"],
-            "name": v["name"],
-            "address": v["address"],
-            "lat": v["lat"],
-            "lng": v["lng"],
-            "rating": None,
-            "rating_count": None,
-            "closed": False,
-            "closure_note": None,
-        }
-        payload["venues"].append(venue)
-        venues_by_id[venue["id"]] = venue
-
         s = entry["stall"]
+        # A manual stall may sit inside a venue the payload already has
+        # (reference it, create nothing) or bring its own manual venue.
+        ref = s.get("venue_ref")
+        if ref:
+            venue = venues_by_id.get(ref)
+            if venue is None:
+                raise SystemExit(f"manual author venue_ref not in payload: {ref}")
+        else:
+            v = entry["venue"]
+            if v["id"] in venues_by_id:
+                raise SystemExit(f"manual author venue id already exists: {v['id']}")
+            venue = {
+                "id": v["id"],
+                "name": v["name"],
+                "address": v["address"],
+                "lat": v["lat"],
+                "lng": v["lng"],
+                "rating": None,
+                "rating_count": None,
+                "closed": False,
+                "closure_note": None,
+            }
+            payload["venues"].append(venue)
+            venues_by_id[venue["id"]] = venue
         stall = {
             "id": s["id"],
             "name": s["name"],

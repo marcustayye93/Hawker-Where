@@ -100,6 +100,34 @@
     "name": "Dong Bei Ren Jia"
    },
    "order": 4
+  },
+  {
+   "stall": {
+    "id": "authors-pick-korean-homestyle-baek-ban",
+    "name": "Korean Homestyle Beak Ban",
+    "cuisine": "Korean",
+    "venue_ref": "wisma-atria-238877",
+    "address": "Food Republic, Wisma Atria, 435 Orchard Road, Singapore 238877",
+    "postal": "238877",
+    "cuisine_label": "Korea food",
+    "dish": null,
+    "evidence": "Marcus named it from Wisma Atria Food Republic and confirmed it with a signboard photo on 2026-10-10 (sign reads 'KOREAN HOMESTYLE BEAK BAN'); not an SFA register record, so it is a manual Author's Pick stall at the existing Wisma Atria venue."
+   },
+   "order": 9
+  },
+  {
+   "stall": {
+    "id": "authors-pick-hot-hot-pot",
+    "name": "Hot Hot Pot",
+    "cuisine": "Mala",
+    "venue_ref": "wisma-atria-238877",
+    "address": "Food Republic, Wisma Atria, 435 Orchard Road, Singapore 238877",
+    "postal": "238877",
+    "cuisine_label": "Mala",
+    "dish": "mala",
+    "evidence": "Marcus named Hot Hot Pot (mala) from Wisma Atria Food Republic and confirmed it with a signboard photo on 2026-10-10; public listings place Hot Hot Pot at Food Republic Level 4, Wisma Atria. Not an SFA register record, so it is a manual Author's Pick stall at the existing Wisma Atria venue."
+   },
+   "order": 10
   }
  ],
  "note": "Author's Pick listings supplied by Marcus on 2026-10-07 and 2026-10-08. This batch lists the specific or flagship location for each name. Applied by scripts/apply-authors-picks.py after apply-corrections.py, before make-taxonomy.py and gen-dish-pages.py. Manual listings are marked author_manual so the headline stall count and dish pages stay register-based."
