@@ -15,6 +15,26 @@
    "name": "Wee Kim Hainanese Chicken Rice",
    "stall_id": "Y510132003",
    "order": 5
+  },
+  {
+   "stall_id": "W84231K002",
+   "dish": "bak chor mee",
+   "cuisine_label": "Bak chor mee",
+   "evidence": "Marcus named Tai Hwa bak chor mee as an Author's Pick on 2026-10-10. SFA record Hill Street Tai Hwa Pork Noodle, 465 Crawford Lane #01-12.",
+   "order": 6
+  },
+  {
+   "stall_id": "SJHC0214001",
+   "dish": "zhi char",
+   "cuisine_label": "BBQ seafood",
+   "evidence": "Marcus named Jiao Cai Seafood for BBQ seafood on 2026-10-10. SFA record Jiao Cai Seafood, Senja Hawker Centre #02-14; the stall sells sambal hotplate BBQ seafood and is Jiao Cai's outlet from the Yishun Park Hawker Centre original.",
+   "order": 7
+  },
+  {
+   "stall_id": "E90054A001",
+   "cuisine_label": "Bak kut teh",
+   "evidence": "Marcus named 'Leng Bak Kut Teh' on 2026-10-10 and confirmed Leong Kee (Klang) when offered the candidates. SFA record Leong Kee (Klang) Bak Kut Teh, 251 Geylang Road. Already tagged bak kut teh in the payload, so no dish change.",
+   "order": 8
   }
  ],
  "manual": [
