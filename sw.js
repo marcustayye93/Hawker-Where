@@ -3,10 +3,11 @@
 // data files are network-first so a data refresh reaches returning
 // users without waiting for a shell bump, with cache as the offline
 // fallback.
-const CACHE_NAME = "hawkerwhere-v20";
+const CACHE_NAME = "hawkerwhere-v21";
 const SHELL = [
   "./",
   "./index.html",
+  "./privacy.html",
   "./styles.css",
   "./app.js",
   "./manifest.json",

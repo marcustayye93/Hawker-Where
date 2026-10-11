@@ -129,3 +129,120 @@ Fix: OpenFreeMap liberty out, positron in. Every basemap layer is recoloured to 
 Verified live in headless Chrome with real tiles: 93 dishes over 5,621 stalls, 150 chicken rice stalls opening as 6 clusters plus 1 single, splitting through 18 and 37 groups to 32 clusters plus 69 single rated pins around Chinatown and Maxwell, stall sheet opens, zero console errors. Pixel check on the map area of the new screenshots: colour channel spread ~0. Screenshots: verify/12-map-v1.png (island) and verify/16-map-zoom3.png (street). Nothing pushed.
 
 Note (3 Oct, later): Marcus re-opened a proof screenshot and still saw the coloured Leaflet map. The image in his screenshot carries the old "Leaflet | OpenStreetMap contributors" attribution, so he was viewing the pre-switch screenshot, not the new grey one (the reused screenshot filenames let the client serve the older cached image). Proof screenshots now go out under fresh filenames (17-map-grey-island.png, 18-map-grey-street.png); the new map's attribution reads "OpenFreeMap". Rule going forward: never reuse a screenshot filename when sending Marcus a revised proof.
+
+## Addendum 9 (3 Oct 2026, pushed to GitHub)
+
+Marcus approved the push ("beautiful okay push it to GitHub"). Jev done-gate ran first: PASS (scope_match complete 1.93, confidence 0.89, threshold 0.8).
+
+Pushed to marcustayye93/Hawker-Where (public, was empty): commit ea1b5e80 on main, "HawkerWhere v1: dish-first hawker map with cached Google ratings", on top of the Contents API seed commit 72c5d78a. 19 files, 3.2 MB: app shell, vendor/maplibre, data/stalls.json plus the sample fallback, scripts/ pipeline, README.md, this summary. Excluded as agreed in the change doc: vendor/leaflet, verify/ harness and screenshots, data backups and progress files, pipeline logs.
+
+Verified after the push through the GitHub API: the recursive tree lists all 19 files with the right sizes, and the README serves from raw.githubusercontent.com. GitHub Pages is NOT enabled (the check returns an error and the Pages URL 404s); enabling it is Marcus's manual Settings tap, and the service worker offline check is owed once the site is live.
+
+## Addendum 10 (3 Oct 2026, live on hawkerwhere.com)
+
+Marcus enabled GitHub Pages (main, root) and the DNS was already in place. His Settings custom-domain entry did not persist (the Pages API showed cname null and hawkerwhere.com returned GitHub's "Site not found"), so the domain was claimed by pushing a CNAME file instead (commit 330a70c5), the same mechanism the Pages UI uses. GitHub built it, claimed hawkerwhere.com, and the certificate state reached approved (expires 1 Jan 2027).
+
+Verified live on the real host, in a real browser, against both marcustayye93.github.io/Hawker-Where and https://hawkerwhere.com/: 93 dish chips, live list of 5,621 stalls, chicken rice opens as 6 clusters plus 1 single with 150 stalls, stall sheet opens (Leng Heng 4.8, 76 reviews), zero console errors. The owed service worker check is now done: the worker registers, caches 10 shell and data entries, and the app reloads fully offline with all 93 dishes. HTTPS answers 200 on the apex and www redirects to it; http is not yet redirected (GitHub's Enforce HTTPS flag is still off while the certificate settles).
+
+## Addendum 11 (3 Oct 2026, search + location batch pushed live)
+
+Marcus replaced the picker: landing is now one search bar under "What food are you looking to eat?" with live dish-name suggestions as the user types. Location fires only when Near me is tapped, which drops the blue dot and centres the map on the user. His three trims all held: no suggestion stall counts, no nearest-first sorting (the list keeps its weighted-rating order), and no automatic location prompt on dish pick. Jev done-gate flagged scope creep through the review rounds (0.93, then 0.89, then 0.55 after each trim); Marcus reviewed the flagged extras and approved the final batch as is.
+
+Pushed as commit 3abde882 (index.html, app.js, styles.css, sw.js with cache hawkerwhere-v4). Verified live on https://hawkerwhere.com/ afterward: clean landing, "chick" suggests chicken rice and curry chicken, no dot before the Near me tap, dot and centring after it, list stays in rating order, service worker v4 caches and reloads offline, zero console errors.
+
+## Addendum 13 (3 Oct 2026, Bib matching extended, local only)
+
+- Marcus asked to retry the 13 unmatched Bib Gourmand names. 8 matched by verified unit number: Beach Road Fish Head Bee Hoon (Blk 91 #01-46), Singapore Fried Hokkien Mee (Blk 90 #01-32), Cheok Kee (Geylang Bahru #01-35), Hui Wei Chilli Ban Mian (#01-58), Spinach Soup (#01-12), Dudu Cooked Food (Jurong West 505 #01-19), Jian Bo Tiong Bahru Shui Kueh (#01-27), Yong Chun Wan Ton Noodle (115 Bukit Merah View #01-56). Tab now 61 establishments / 68 stall records.
+- Not matched, honestly: Na Na Curry and Yi Pin Wei (register lists a different named stall at the cited unit), Boon Keng Road Fish Head Bee Hoon (operates from a Bedok kopitiam, outside the NEA register), Hai Nan Zai and Ji De Lai (Chong Pang has no stalls in the register).
+- Where Michelin's specialty maps to a taxonomy dish and the stall had none, dish set from the Bib evidence (fish soup, hokkien mee, duck rice, ban mian, kueh x2, wanton mee); Spinach Soup left dishless. apply-bib.py now does this. Verified: 68 cards, A Noodle Story sheet flow, zero real errors. Still NOT pushed; gate still FLAG (creep 0.90).
+
+## Addendum 14 (5 Oct 2026, saved stalls + HeyNemo borrows, local only)
+
+- Marcus reviewed the CheapFoodMap and HeyNemo teardowns (Firecrawl scrape + Grok independent pass). Adopted: saved stalls (big add button repurposed to store selected stalls; localStorage, on-device), shareable ?dish=/?stall= links, pin-above-sheet offset, cluster tap overshoot +0.25. Rejected by Marcus: freshness dates. Also rejected: HeyNemo 3D tilt (violates his simple 2D rule) and its 25-layer system; no React replatform.
+- Verified (verify/verify_saved_links.py, verify/verify_cant_decide.py): save persists across reload, deep links land, Bib flow clean, zero errors. sw cache hawkerwhere-v6.
+- Jev done-gate: FLAG (creep 0.97) - the Can't Decide batch keeps accreting features Marcus did not name in the original ask (saved + links + offsets are his calls from 4 Oct, but outside the gate's original spec). Awaiting his push call; still NOT pushed.
+
+## Addendum 15 (5 Oct 2026, Can't Decide batch PUSHED LIVE)
+
+- Marcus approved ("push the big Gorman 61 establishments"; Author's Pick content deferred to a later push, placeholder tab ships). Commit 2be601af on main: index.html, app.js, styles.css, sw.js (hawkerwhere-v6), data/stalls.json (68 bib-flagged records), data/bib_gourmand.json, scripts/apply-bib.py, scripts/match-bib-gourmand.py.
+- Verified live on https://hawkerwhere.com/ (verify/verify_saved_links.py with HW_PAGE): landing saved button, Bib sheet flow, save persists, ?stall= and ?dish=laksa deep links, 34 laksa stalls, zero errors.
+- Follow-up already built locally, awaiting his push call: headline "Find your food in Singapore" + centred picker-meta (index.html/styles.css, sw hawkerwhere-v7), verified on the capture build.
+- The 5 unmapped Bib hawkers stay off the tab honestly; two unit-conflict names retry during the Nov 1 harvest, the kopitiam one waits for v1.1, the two Chong Pang names wait for register records.
+
+## Addendum 16 (5 Oct 2026, headline + restyle PUSHED LIVE)
+
+- Headline batch: commit 49b6b5c2 ("Find your food in Singapore", centred headline + meta, sw v7). Gate FLAG (creep 0.86); Marcus ordered the push anyway. Verified live on hawkerwhere.com (h1 centred, zero exceptions).
+- Restyle batch: Marcus sent his Stock Research Tool screenshot as the reference: serif display headlines (Iowan Old Style/Georgia stack) + system sans, angular buttons (12px), search bar 14px, cards 12px; choices (Stalls/Venues, Bib/Author's Pick) are borderless tabs with a 2px red underline; map pins/clusters stay round. Commit 02ff2d2d, sw v8. Gate FLAG (partial 1.45, creep 0.69); Marcus approved after seeing the capture screenshot. Verified live (serif h1, red tab underline, 12px saved button); first load after push serves the old SW shell once, then v8 takes over.
+
+## Addendum 17 (5 Oct 2026, tagline + Bib regions PUSHED LIVE)
+
+- Commit 0342c021: tagline "Your local dish companion" + Bib Gourmand region filter (All/North/South/East/West/Central tabs under the Bib tab; regionOf() coordinate buckets in app.js; hidden on Author's Pick; empty region message). sw hawkerwhere-v10. Gate FLAG (creep 0.77, complete 1.96); Marcus approved on the screenshot.
+- Region distribution (records/establishments): central 47/42, west 9/8, south 8/8, east 4/3, north 0. Verified live on hawkerwhere.com with a clean browser profile: new tagline, 6 region tabs, West filter shows 9 cards with "(West)" note, zero exceptions. Note: the returning-visitor service worker serves the old shell for one load after each push; documented pattern since v8.
+- Harness notes from this session: copying app files into verify/capture/ wipes BOTH capture patches (data-inline script tag AND the loadData boot patch); re-apply both after every copy. The proxy relay (127.0.0.1:8899) can wedge with a stale upstream; kill the listener pid and restart proxy_relay.py.
+
+## Addendum 18 (5 Oct 2026, Grok audit fixes PUSHED LIVE)
+
+- Grok deep audit (Marcus's request): 56/100, verdict KEEP. Full text in ~/workspace/roundtable/sessions/2026-10-05-hawkerwhere-grok-audit/. Boiny verified each claim against the code before implementing; two corrections surfaced: the venue review-count was already capped at 10 in the sort, and the sheet already labels evidence + "venue rating".
+- Commit c7af8fc4: app.js, index.html, styles.css, sw.js (v12), data/taxonomy.json, scripts/make-taxonomy.py, scripts/gen-dish-pages.py, 90 dish pages, sitemap.xml (91 URLs), robots.txt. Gate FLAG (creep 0.76); Marcus approved.
+- Live-verified on hawkerwhere.com (clean load + relay): landing meta, Maxwell venue search (100 stalls incl. untagged), venue view, dish page 200 with correct title, zero exceptions.
+- Declined from Grok's list (recorded in gate change doc): deleting Author's Pick placeholder, clipboard tag export, rating cache dates (owner rejected freshness dates), live search/3D/accounts.
+- Nov 1 cron note: after merge-places.py regenerates the payload, rerun scripts/make-taxonomy.py AND scripts/gen-dish-pages.py AND apply-bib.py, or the new files silently go stale.
+
+## Addendum 19 (5 Oct 2026, hokkien-name fix PUSHED LIVE)
+
+- Trigger: Marcus at Ang Mo Kio 628 found Sumo Fried Hokkien Prawn Mee "missing". Root cause: register trade name is the plain "Fried Hokkien Prawn Noodle" (no Sumo branding anywhere in the SFA record) and the name parser had the stall under prawn mee. 18 stalls with "Hokkien" in the name sat under prawn mee.
+- Commit 9f5033b9 (Marcus approved): 17 stalls flipped to hokkien mee via data/corrections.json + scripts/apply-corrections.py (idempotent; run after apply-bib.py on every payload regeneration; also added to the Nov 1 cron body). Deliberately NOT flipped: The Old Stall Hokkien Street Famous Prawn Mee (Hong Lim #02-67) - verified soup hae mee (1943 lineage), reason recorded in corrections.json. Sumo Big Prawn #01-72 untouched: Marcus confirmed it closed and Imperial Fish Soup replaced it, register current.
+- AM80176003 renamed "Sumo Fried Hokkien Prawn Mee", also: carrot cake, oyster omelette, dish_source "correction" (app.js gains the sentence "Dish corrected from local evidence."). classify.py name-pass rule order fixed (hokkien before prawn). sw v13. Dish pages regenerated.
+- Live-verified 6 Oct: hokkien mee = 90 stalls on the 16,073-stall payload (the kopitiam import merged later on 5 Oct and carried the corrections; live blob sha matches local), "sumo" suggests the stall, zero exceptions. Gate FLAG (creep 0.68), disclosed before push.
+- Open judgment call for Marcus: BL201163003 "Penang Hokkien Noodle" stays hokkien mee (Penang hokkien mee is strictly soup-style; no stall-level evidence; no silent flip).
+
+## Addendum 20 (7 Oct 2026, landing map teaser + red-N fix PUSHED LIVE)
+
+- Commit 2655b4c0 (Marcus approved): landing gains a clickable mini-map (second non-interactive MapLibre instance, grey, smaller cluster badges, zoomed to the island; tap focuses the search bar); the .r-rating::first-letter CSS that painted the "N" of "No rating yet" red is gone (star is now a .star span; only the star is red); Adam Rd Noo Cheng Big Prawn Noodle (ADF0127003) renamed from Michelin's listing + dished prawn mee via corrections.json (18 entries); payload/dish pages/taxonomy regenerated; sw v14.
+- Live-verified: landing badges render (16 at island zoom), zero exceptions.
+- Desktop layout built in the same session (CSS-only, @media 900px: two-pane map, 400px sheet card, 880px landing) and presented separately, gate FLAG creep 0.55.
+
+## Addendum 21 (8 Oct 2026, Author's Pick listings PUSHED LIVE)
+
+- Pushed 8 Oct 2026 on Marcus's approval: commit 0bf52a7e on main, sw hawkerwhere-v16. Live-verified on hawkerwhere.com: sw.js serves v16, live payload carries the 5 author picks, hokkien mee dish page reads 91 stalls, Author's Pick tab renders the grouped list in a clean browser with zero console errors.
+
+- Marcus supplied Author's Pick names: Neighbourwok (Hokkien Mee), Lazy Lizard (Western food), Pietro Pizza (Italian food), Dong Bei Ren Jia (China food), then added Wee Kim Hainanese Chicken Rice at Yishun Park Hawker Centre. Built as specific or flagship locations: The Neighbourwok at Bukit Batok, Lazy Lizard Sixth Avenue, Pietro Ristorante Italiano, Dong Bei Ren Jia, and Wee Kim at Yishun Park Hawker Centre #01-32.
+- Author's Pick now groups by region headings (North, South, East, West, Central) with the cuisine as a red sub-label on each card. Cards open the place itself, not the whole dish category. Manual non-register places are marked author_manual, so the headline register count stays 16,073 and generated dish pages stay register-based.
+- Durable route: data/authors_picks.json + scripts/apply-authors-picks.py, run after apply-corrections.py and before make-taxonomy.py/gen-dish-pages.py. The Nov 1 cron body now includes that step. DONG BEI CAI at People's Park Food Centre is deliberately not flagged as Dong Bei Ren Jia.
+- Verified locally on the capture build: Author heads North/West/Central, 5 cards with cuisine labels, Wee Kim and Pietro sheets open correctly, Bib flow and saved/deep-link suite pass, zero page errors in verify_cant_decide.py. sw hawkerwhere-v16.
+
+## Addendum 22 (9 Oct 2026, self-healing updates PUSHED LIVE)
+
+- Trigger: Marcus reported zooming the map never updated the stall list on his phone. Reproduced on the live site first (phone-size emulation): zoom buttons, cluster taps and pinch all narrowed the list correctly ("40 stalls" to "4 of 40" etc.), zero errors, and live app.js contained syncListToViewport. The list logic was never broken.
+- Root cause: delivery. A page keeps running the app.js it loaded with; clients.claim() swaps the controller, not the running script, and data is network-first so the app looks current. On a rarely-closed iPhone PWA the running code stayed pre-v15 indefinitely, so no moveend listener existed. There was no mechanism to reload a stale page onto a fresh shell.
+- Commit 843e63aa (Marcus approved): sw hawkerwhere-v17 force-reloads open pages onto the fresh shell when an upgrade activates (first installs excluded, so first-time visitors are not bounced); app.js checks for updates on foreground return and reloads once if a new worker takes control mid-session. No data changes.
+- Live upgrade proof (the step the local sim could not run, Chrome loopback blocked): a browser page was held open on v16 ("40 stalls", cache hawkerwhere-v16); after deploy, an update check made the page reload itself in about 11s onto v17, and the zoom test then narrowed to "4 of 40 stalls in this view", zero exceptions. Screenshot verify/44-healed-live-zoom.png.
+- Done gate FLAG again (scope complete 1.52, creep 0.37, blocker 0.35, confidence 0.30): Jev low-confidence because the fix does not touch list code, which was the correct call. Marcus approved the push.
+
+## Addendum 23 (10 Oct 2026, Author's Pick +3 PUSHED LIVE)
+
+- Marcus added three picks (2026-10-10): "tai Hwa bachormee", "Leng Bak Kut Teh", and "Jiao cai seafood for bbq seafood". Resolved against the register: Hill Street Tai Hwa Pork Noodle (W84231K002, 465 Crawford Lane #01-12, previously untagged, now dish bak chor mee via dish_source author_pick, cuisine label "Bak chor mee"); Jiao Cai Seafood (SJHC0214001, Senja Hawker Centre #02-14, venue rating 4.1, tagged zhi char, label "BBQ seafood"; Senja is the brand's outlet from the Yishun Park original, he picked the name-matched stall, Yishun alternative flagged). "Leng Bak Kut Teh" matched nothing; offered Leong Kee (Klang) vs Legendary Rangoon Road, Marcus tapped "Push these two, add Leong Kee (Klang) too", so E90054A001 Leong Kee (Klang) Bak Kut Teh (251 Geylang Road, already tagged bak kut teh, label "Bak kut teh") joined too. Its duplicate company record stays unflagged. Central group now 6, total picks 8. Jev gate FLAG (scope partial 1.35, creep 0.66, confidence 0.47) on the unresolved Leng question; disclosed, Marcus ruled, pushed on his tap.
+- Commit 519550378, sw hawkerwhere-v18 (push message says +2; the batch carries all three picks because Leong Kee was added before the push). Pushed: authors_picks.json, stalls.json, taxonomy.json, bak chor mee + zhi char dish pages, sw.js.
+- Verified live: sw v18, Author's Pick renders 8 cards (North 1, West 1, Central 6) with cuisine labels, zero exceptions. Screenshots: 45 (capture 7-card), 48 (Leong Kee sheet), 49 (live 8-card).
+
+## Addendum 24 (10 Oct 2026, Author's Pick +2 Wisma Atria PUSHED LIVE)
+
+- Marcus at Wisma Atria added two Food Republic stalls (2026-10-10): a Korean stall and Hot Hot Pot (mala), neither in the SFA register (the Wisma Atria venue holds 6 register records), exactly as he suspected his database was behind. Both went in as author_manual records. The Korean stall's signboard (his photo) literally reads "KOREAN HOMESTYLE BEAK BAN", which matched his words exactly, so his spelling stands: "Korean Homestyle Beak Ban", label "Korea food", no dish tag (no Korean dish exists, same as Pietro). Hot Hot Pot: label "Mala", dish mala (his pick is the evidence). Both attach to the existing Wisma Atria venue record. apply-authors-picks.py gained a backward-compatible venue_ref branch for manual stalls inside registered venues. Jev FLAG (creep 0.59 on the script generalization + mala tag; scope complete 1.98, confidence 0.97), disclosed, Marcus tapped "Push the two Wisma Atria picks".
+- Commit e17ad9b6, sw hawkerwhere-v19. Pushed: authors_picks.json, stalls.json, scripts/apply-authors-picks.py, sw.js. Payload 16,078 records / 1,553 venues, register count still 16,073.
+- Verified live: sw v19, Author's Pick renders 10 cards (North 1, West 1, Central 8) with correct labels, zero exceptions. Screenshots: 50 (capture 10-card), 51 (Beak Ban sheet), 52 (Hot Hot Pot sheet).
+- Follow-ups Marcus raised right after the push (same evening, built locally, push pending his call): an intro line at the top of the Author's Pick list in his voice; renaming the Korean stall to Jangsan Korean Cuisine (menu header "JANG SAN KOREAN CUISINE", Stall 15) with the homestyle name kept visible; and adding their Clementi outlet (NEWest, 1 West Coast Drive #01-107, the brand's original; coords 1.31641, 103.75745, Central by the app's region rules).
+
+## Addendum 25 (11 Oct 2026, Author's Pick intro line + Jangsan PUSHED LIVE)
+
+- Gate PASS this time (scope complete 1.95, confidence 0.93). Marcus tapped "Push the intro line and the two Jangsan entries".
+- Intro line at the top of the Author's Pick list (app.js renderInspire + .inspire-intro in styles.css): "Every pick here is food I stand behind. Not the tourist-famous names, just food that truly hits the spot for me, and I am glad to share it." Rephrased from his words of 2026-10-10.
+- Jangsan: the Wisma Atria Korean stall renamed to "Jangsan Korean Cuisine (Korean Homestyle Beak Ban)" (Jangsan primary, homestyle name kept visible per his instruction; unit #04-15 from his menu photo) and the Clementi outlet added at NEWest, 1 West Coast Drive #01-107, Singapore 128020 (OneMap coords 1.31641, 103.75745; Central under the app's region rules). 11 picks, payload 16,079 records / 1,554 venues, register count still 16,073.
+- Commit 27d477f8, sw hawkerwhere-v20. Pushed: app.js, styles.css, authors_picks.json, stalls.json, sw.js.
+- Verified live: sw v20, 11 cards with both Jangsan entries, zero exceptions; live app.js carries the intro line. Screenshot: 53 (capture, intro + list).
+
+## Addendum 26 (11 Oct 2026, Meta Pixel + privacy page PUSHED LIVE)
+
+- Pre-launch batch for the first Meta ads campaign (adopted modified plan, 2026-10-11): Meta Pixel installed on the site and a privacy notice page added. Dataset "HawkerWhere" (ID 1628915405255644) created by Marcus in Events Manager and verified via the Ads API in the gethowmuch business before the push.
+- index.html: pixel base code verbatim in head (fbq init + PageView + noscript) and a small Privacy footer link at the bottom of the picker screen. privacy.html: new page with the notice text (no accounts, anonymous usage data, Near me location stays on device, Meta Pixel disclosure, no data sale), dated 11 October 2026. sw.js: cache hawkerwhere-v21, privacy.html added to the shell. app.js and styles.css untouched.
+- Verified locally on the capture build before the push: app boots with full data, fbq loads, pixel script present, Privacy link in the rendered page, zero exceptions; privacy page rendered in brand style.
+- Jev gate FLAG on a confidence dip (scope complete 1.86-1.97 across runs, creep 0.12, blocker 0.19; second run confidence 0.78 against the 0.8 line). Disclosed to Marcus; he tapped "Push the pixel batch".
