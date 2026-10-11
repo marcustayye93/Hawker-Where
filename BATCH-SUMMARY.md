@@ -246,3 +246,8 @@ Pushed as commit 3abde882 (index.html, app.js, styles.css, sw.js with cache hawk
 - index.html: pixel base code verbatim in head (fbq init + PageView + noscript) and a small Privacy footer link at the bottom of the picker screen. privacy.html: new page with the notice text (no accounts, anonymous usage data, Near me location stays on device, Meta Pixel disclosure, no data sale), dated 11 October 2026. sw.js: cache hawkerwhere-v21, privacy.html added to the shell. app.js and styles.css untouched.
 - Verified locally on the capture build before the push: app boots with full data, fbq loads, pixel script present, Privacy link in the rendered page, zero exceptions; privacy page rendered in brand style.
 - Jev gate FLAG on a confidence dip (scope complete 1.86-1.97 across runs, creep 0.12, blocker 0.19; second run confidence 0.78 against the 0.8 line). Disclosed to Marcus; he tapped "Push the pixel batch".
+
+## Addendum 27 (11 Oct 2026, facebook-domain-verification tag PUSHED LIVE)
+
+- Marcus supplied the exact meta tag from Meta Business Settings and asked for it to be added: facebook-domain-verification, content g3ihc3z2lo0jjfljq3w5v0xksk2n4u, inserted in the index.html head. sw.js bumped to hawkerwhere-v22 (the standing shell-change mechanism). Nothing else changed.
+- Jev gate FLAG (creep 0.94): the scorer read the service worker bump as creep because the spec text omitted it. Disclosed to Marcus as a spec-wording miss; he tapped "Push the domain verification tag".
