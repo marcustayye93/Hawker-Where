@@ -176,6 +176,21 @@
     return [];
   }
 
+  // Meta Pixel ViewContent: a completed search (a dish, place or
+  // stall picked from the search suggestions) is the search signal.
+  // Guarded: no pixel loaded, no event, and never an app error.
+  function trackSearch(name, type) {
+    try {
+      if (window.fbq) {
+        fbq("track", "ViewContent", {
+          content_name: name,
+          content_type: type,
+          content_category: "search"
+        });
+      }
+    } catch (e) { /* analytics must never break the app */ }
+  }
+
   // Live suggestions under the one search bar: dishes first, then
   // venues and stall names once the full payload has landed. The
   // untagged stalls are invisible to dish search; venue and stall
@@ -248,13 +263,13 @@
     }
     if (dishes.length) {
       dishes.forEach(function (dish) {
-        addItem(dish, "", function () { pickDish(dish); });
+        addItem(dish, "", function () { trackSearch(dish, "dish"); pickDish(dish); });
       });
     }
     if (venues.length) {
       addHead("Places");
       venues.forEach(function (v) {
-        addItem(v.name, "", function () { pickVenue(v); });
+        addItem(v.name, "", function () { trackSearch(v.name, "venue"); pickVenue(v); });
       });
     }
     if (stalls.length) {
@@ -262,7 +277,7 @@
       stalls.forEach(function (s) {
         var v = venueById[s.venue_id];
         addItem(s.author_name || s.name, (s.author_cuisine || s.dish || "dish not tagged") + (v ? " · " + v.name : ""),
-          function () { openCuratedStall(s); });
+          function () { trackSearch(s.author_name || s.name, "stall"); openCuratedStall(s); });
       });
     }
     box.classList.remove("hidden");
@@ -782,7 +797,7 @@
         if (!v) return;
         items.push({
           pos: jitter(v.lat, v.lng, stall.id),
-          html: pinHtml(stall.rating, stall.rating_source),
+          html: pinHtml(stall.rating_source === "venue" ? null : stall.rating, stall.rating_source),
           title: stall.name,
           action: function () { openSheet(stall); }
         });
@@ -907,15 +922,13 @@
   function sortKey(s) {
     // Weighted rating: a 5.0 from 3 reviews must not outrank a 4.7
     // backed by hundreds. Bayesian average against the dataset mean.
-    // Venue (centre) ratings sit in their own tier below every stall's
-    // own rating, with the centre's review count capped inside the
-    // weight, so a centre score can never masquerade as a stall score.
-    // Unrated stalls last. Location never reorders this list.
-    if (s.rating == null) return [2, 0];
+    // A stall whose only rating is its venue's (centre's) counts as
+    // unrated: the centre's number is never a stall score. Unrated
+    // stalls last. Location never reorders this list.
+    if (s.rating == null || s.rating_source === "venue") return [2, 0];
     var c = s.rating_count || 0;
-    if (s.rating_source === "venue") c = Math.min(c, 10);
     var w = (s.rating * c + 3.9 * 25) / (c + 25);
-    return [s.rating_source === "venue" ? 1 : 0, -w];
+    return [0, -w];
   }
 
   // Keep the plain-text list in step with the map: whatever pins
@@ -961,17 +974,7 @@
       var ka = sortKey(a), kb = sortKey(b);
       return ka[0] - kb[0] || ka[1] - kb[1];
     }).slice(0, 30);
-    var seenTierBoundary = false;
     sorted.forEach(function (s) {
-      // One quiet note where centre-rated stalls begin, so nobody
-      // mistakes a centre score for a stall score while scrolling.
-      if (!seenTierBoundary && s.rating != null && s.rating_source === "venue") {
-        seenTierBoundary = true;
-        var note = document.createElement("li");
-        note.className = "sort-note";
-        note.textContent = "Centre ratings below. The number is the food centre's, not the stall's.";
-        list.appendChild(note);
-      }
       var v = stallVenue(s);
       var li = document.createElement("li");
       var btn = document.createElement("button");
@@ -1052,15 +1055,11 @@
   }
 
   function ratingLine(stall) {
-    if (stall.rating_source === "venue") {
-      if (stall.rating == null) return { short: "No rating yet", long: "No rating yet" };
-      return {
-        short: "\u2605 " + stall.rating.toFixed(1) + " venue rating",
-        long: "\u2605 " + stall.rating.toFixed(1) +
-          " <span class='count'>(" + fmtCount(stall.rating_count) + " reviews, venue rating)</span>"
-      };
+    // A venue (centre) rating belongs to the centre, not the stall:
+    // a stall that only inherited one presents as unrated everywhere.
+    if (stall.rating == null || stall.rating_source === "venue") {
+      return { short: "No rating yet", long: "No rating yet" };
     }
-    if (stall.rating == null) return { short: "No rating yet", long: "No rating yet" };
     return {
       short: "\u2605 " + stall.rating.toFixed(1),
       long: "\u2605 " + stall.rating.toFixed(1) +

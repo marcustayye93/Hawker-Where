@@ -49,20 +49,16 @@ def cap(dish):
 
 
 def weight(s):
-    if s.get("rating") is None:
+    if s.get("rating") is None or s.get("rating_source") == "venue":
         return (2, 0.0)
     c = s.get("rating_count") or 0
-    if s.get("rating_source") == "venue":
-        c = min(c, 10)
     w = (s["rating"] * c + 3.9 * 25) / (c + 25)
-    return (1 if s.get("rating_source") == "venue" else 0, -w)
+    return (0, -w)
 
 
 def rating_text(s):
-    if s.get("rating") is None:
+    if s.get("rating") is None or s.get("rating_source") == "venue":
         return "No rating yet"
-    if s.get("rating_source") == "venue":
-        return "★ %.1f centre rating" % s["rating"]
     rc = s.get("rating_count")
     return "★ %.1f%s" % (s["rating"], (" (%d reviews)" % rc) if rc else "")
 
@@ -108,7 +104,7 @@ def dish_page(dish, stalls, venues_by_id):
 <a class="brand" href="%s/">HawkerWhere</a>
 <p class="tag">Your local dish companion</p>
 <h1>%s in Singapore</h1>
-<p class="sub">%d stalls across %d hawker centres. Ratings shown are each stall's own Google rating; centre ratings are labelled.</p>
+<p class="sub">%d stalls across %d hawker centres. Ratings shown are each stall's own Google rating.</p>
 <a class="cta" href="%s">See them on the map</a>
 <ol>
 %s

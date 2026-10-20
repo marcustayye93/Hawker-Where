@@ -251,3 +251,20 @@ Pushed as commit 3abde882 (index.html, app.js, styles.css, sw.js with cache hawk
 
 - Marcus supplied the exact meta tag from Meta Business Settings and asked for it to be added: facebook-domain-verification, content g3ihc3z2lo0jjfljq3w5v0xksk2n4u, inserted in the index.html head. sw.js bumped to hawkerwhere-v22 (the standing shell-change mechanism). Nothing else changed.
 - Jev gate FLAG (creep 0.94): the scorer read the service worker bump as creep because the spec text omitted it. Disclosed to Marcus as a spec-wording miss; he tapped "Push the domain verification tag".
+
+## Addendum 28 (2026-10-11): ViewContent search event for the Meta Pixel
+
+- app.js: a guarded trackSearch() helper fires fbq('track', 'ViewContent', {content_name, content_type, content_category: 'search'}) at the three search-selection points in renderSuggestions: a dish pick (type 'dish'), a place pick (type 'venue'), and a stall pick (type 'stall'). The Enter key path clicks the first suggestion, so it is covered by the same handlers. Deep links, map browsing and saved stalls do not fire it: the event means "the user searched and chose a result".
+- sw.js: cache bumped to hawkerwhere-v23 (app.js is in the shell).
+- index.html unchanged (the pixel base code from Addendum 26 already loads fbq on every page).
+- Verified on the capture build (file://, full payload): three simulated searches each produced exactly one ViewContent call with the expected parameters (dish 'laksa'; venue 'Maxwell Food Centre (Kim Hua Market)'; stall 'Tian Tian Xiang'), and the run had zero JS exceptions.
+- Purpose: the event gives the HawkerWhere dataset a deeper optimisation and audience signal than PageView alone, per the campaign plan discussion on 2026-10-11.
+
+## Addendum 29 (2026-10-20): venue-inherited ratings present as unrated (option A)
+
+- Trigger: user feedback that every stall at Pasir Ris Central Hawker Centre shows 4.1 stars. Root cause (verified in data): merge-places.py fetches one Google rating per venue, then stamps every stall lacking an individual rating with the venue's rating and review count (rating_source "venue"). At Pasir Ris Central all 31 stalls carry the centre's own 4.1 (2,161 reviews); island-wide 2,561 of 4,891 rated stalls (52%) hold an inherited number across 74 venues.
+- Marcus chose option A (full display fix) on 2026-10-20.
+- app.js: ratingLine() returns "No rating yet" for rating_source "venue" (covers result list, picker lists, Author's Picks, saved list and the stall sheet, which all funnel through it); sortKey() ranks venue-sourced stalls with the unrated tier; the result list no longer inserts the "Centre ratings below" note; stall map pins for venue-sourced stalls render as no-rating pins. Venue-mode pins are untouched: a centre's own pin still shows its own rating.
+- scripts/gen-dish-pages.py: weight() and rating_text() apply the same rule; the page subtitle no longer claims centre ratings are labelled. All 88 dish pages regenerated; no "venue rating" or "centre rating" string remains in app.js or dish/.
+- sw.js: cache bumped to hawkerwhere-v24. This push also carries the Addendum 28 ViewContent batch (built 2026-10-11, never pushed; live was still v22), so app.js ships with both changes.
+- Verified on the capture build: Pasir Ris Central venue view lists all stalls as "No rating yet" with no centre note and zero star pins (21 clusters, 7 no-rating pins); Venues mode still shows the centre's own 4.1 pin; laksa list still leads with Eddy's 4.7 (301 reviews) on its own rating; Wee Kim's sheet now reads "No rating yet"; zero JS exceptions.
